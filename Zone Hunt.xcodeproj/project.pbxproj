@@ -1,0 +1,587 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6252C909888001AEC91 /* Zone_HuntApp.swift */; };
+		C484C6282C909888001AEC91 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6272C909888001AEC91 /* ContentView.swift */; };
+		C484C62A2C90988A001AEC91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C484C6292C90988A001AEC91 /* Assets.xcassets */; };
+		C484C62D2C90988A001AEC91 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C484C62C2C90988A001AEC91 /* Preview Assets.xcassets */; };
+		C484C6372C90988A001AEC91 /* Zone_HuntTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6362C90988A001AEC91 /* Zone_HuntTests.swift */; };
+		C484C6412C90988A001AEC91 /* Zone_HuntUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */; };
+		C484C6432C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C484C6332C90988A001AEC91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C484C61A2C909888001AEC91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C484C6212C909888001AEC91;
+			remoteInfo = "Zone Hunt";
+		};
+		C484C63D2C90988A001AEC91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C484C61A2C909888001AEC91 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C484C6212C909888001AEC91;
+			remoteInfo = "Zone Hunt";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C484C6222C909888001AEC91 /* Zone Hunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zone Hunt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C6252C909888001AEC91 /* Zone_HuntApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntApp.swift; sourceTree = "<group>"; };
+		C484C6272C909888001AEC91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C484C6292C90988A001AEC91 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C484C62C2C90988A001AEC91 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zone HuntTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C6362C90988A001AEC91 /* Zone_HuntTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntTests.swift; sourceTree = "<group>"; };
+		C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zone HuntUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITests.swift; sourceTree = "<group>"; };
+		C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C484C61F2C909888001AEC91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C62F2C90988A001AEC91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C6392C90988A001AEC91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C484C6192C909888001AEC91 = {
+			isa = PBXGroup;
+			children = (
+				C484C6242C909888001AEC91 /* Zone Hunt */,
+				C484C6352C90988A001AEC91 /* Zone HuntTests */,
+				C484C63F2C90988A001AEC91 /* Zone HuntUITests */,
+				C484C6232C909888001AEC91 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C484C6232C909888001AEC91 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C484C6222C909888001AEC91 /* Zone Hunt.app */,
+				C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */,
+				C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C484C6242C909888001AEC91 /* Zone Hunt */ = {
+			isa = PBXGroup;
+			children = (
+				C484C6252C909888001AEC91 /* Zone_HuntApp.swift */,
+				C484C6272C909888001AEC91 /* ContentView.swift */,
+				C484C6292C90988A001AEC91 /* Assets.xcassets */,
+				C484C62B2C90988A001AEC91 /* Preview Content */,
+			);
+			path = "Zone Hunt";
+			sourceTree = "<group>";
+		};
+		C484C62B2C90988A001AEC91 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C484C62C2C90988A001AEC91 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C484C6352C90988A001AEC91 /* Zone HuntTests */ = {
+			isa = PBXGroup;
+			children = (
+				C484C6362C90988A001AEC91 /* Zone_HuntTests.swift */,
+			);
+			path = "Zone HuntTests";
+			sourceTree = "<group>";
+		};
+		C484C63F2C90988A001AEC91 /* Zone HuntUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */,
+				C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */,
+			);
+			path = "Zone HuntUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C484C6212C909888001AEC91 /* Zone Hunt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone Hunt" */;
+			buildPhases = (
+				C484C61E2C909888001AEC91 /* Sources */,
+				C484C61F2C909888001AEC91 /* Frameworks */,
+				C484C6202C909888001AEC91 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Zone Hunt";
+			productName = "Zone Hunt";
+			productReference = C484C6222C909888001AEC91 /* Zone Hunt.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C484C6312C90988A001AEC91 /* Zone HuntTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntTests" */;
+			buildPhases = (
+				C484C62E2C90988A001AEC91 /* Sources */,
+				C484C62F2C90988A001AEC91 /* Frameworks */,
+				C484C6302C90988A001AEC91 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C484C6342C90988A001AEC91 /* PBXTargetDependency */,
+			);
+			name = "Zone HuntTests";
+			productName = "Zone HuntTests";
+			productReference = C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C484C63B2C90988A001AEC91 /* Zone HuntUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntUITests" */;
+			buildPhases = (
+				C484C6382C90988A001AEC91 /* Sources */,
+				C484C6392C90988A001AEC91 /* Frameworks */,
+				C484C63A2C90988A001AEC91 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C484C63E2C90988A001AEC91 /* PBXTargetDependency */,
+			);
+			name = "Zone HuntUITests";
+			productName = "Zone HuntUITests";
+			productReference = C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C484C61A2C909888001AEC91 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					C484C6212C909888001AEC91 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					C484C6312C90988A001AEC91 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = C484C6212C909888001AEC91;
+					};
+					C484C63B2C90988A001AEC91 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = C484C6212C909888001AEC91;
+					};
+				};
+			};
+			buildConfigurationList = C484C61D2C909888001AEC91 /* Build configuration list for PBXProject "Zone Hunt" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C484C6192C909888001AEC91;
+			productRefGroup = C484C6232C909888001AEC91 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C484C6212C909888001AEC91 /* Zone Hunt */,
+				C484C6312C90988A001AEC91 /* Zone HuntTests */,
+				C484C63B2C90988A001AEC91 /* Zone HuntUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C484C6202C909888001AEC91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C484C62D2C90988A001AEC91 /* Preview Assets.xcassets in Resources */,
+				C484C62A2C90988A001AEC91 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C6302C90988A001AEC91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C63A2C90988A001AEC91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C484C61E2C909888001AEC91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C484C6282C909888001AEC91 /* ContentView.swift in Sources */,
+				C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C62E2C90988A001AEC91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C484C6372C90988A001AEC91 /* Zone_HuntTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C484C6382C90988A001AEC91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C484C6412C90988A001AEC91 /* Zone_HuntUITests.swift in Sources */,
+				C484C6432C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C484C6342C90988A001AEC91 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C484C6212C909888001AEC91 /* Zone Hunt */;
+			targetProxy = C484C6332C90988A001AEC91 /* PBXContainerItemProxy */;
+		};
+		C484C63E2C90988A001AEC91 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C484C6212C909888001AEC91 /* Zone Hunt */;
+			targetProxy = C484C63D2C90988A001AEC91 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C484C6442C90988A001AEC91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C484C6452C90988A001AEC91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C484C6472C90988A001AEC91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Zone Hunt/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-Hunt";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C484C6482C90988A001AEC91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Zone Hunt/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-Hunt";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C484C64A2C90988A001AEC91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-HuntTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Zone Hunt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Zone Hunt";
+			};
+			name = Debug;
+		};
+		C484C64B2C90988A001AEC91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-HuntTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Zone Hunt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Zone Hunt";
+			};
+			name = Release;
+		};
+		C484C64D2C90988A001AEC91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-HuntUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Zone Hunt";
+			};
+			name = Debug;
+		};
+		C484C64E2C90988A001AEC91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "MILC-Games.Zone-HuntUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Zone Hunt";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C484C61D2C909888001AEC91 /* Build configuration list for PBXProject "Zone Hunt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C484C6442C90988A001AEC91 /* Debug */,
+				C484C6452C90988A001AEC91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone Hunt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C484C6472C90988A001AEC91 /* Debug */,
+				C484C6482C90988A001AEC91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C484C64A2C90988A001AEC91 /* Debug */,
+				C484C64B2C90988A001AEC91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C484C64D2C90988A001AEC91 /* Debug */,
+				C484C64E2C90988A001AEC91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C484C61A2C909888001AEC91 /* Project object */;
+}
