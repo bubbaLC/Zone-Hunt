@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>537106447777-jf5858bppk39fjps5dtec514ku0t9ght.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.537106447777-jf5858bppk39fjps5dtec514ku0t9ght</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD-k-RqF7doJT3s5bIQG4ibX-bMK7VXoIw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>537106447777</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.MILC-Games.Zone-Hunt</string>
+	<key>PROJECT_ID</key>
+	<string>zone-tag</string>
+	<key>STORAGE_BUCKET</key>
+	<string>zone-tag.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:537106447777:ios:7285e3cb1600e290011fe0</string>
+</dict>
+</plist>
