@@ -11,6 +11,7 @@ struct LobbyView: View {
     @State private var isCreatingGame = false
     @State private var isJoiningGame = false
     let charLimit = 6
+    // test
     var body: some View {
         NavigationView {
             ZStack{
