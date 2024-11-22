@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2FEDC9552CF0E54A0051EFC4 /* SignInGoogleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FEDC9542CF0E54A0051EFC4 /* SignInGoogleHelper.swift */; };
+		2FEDC9572CF0E6B70051EFC4 /* Zone-Hunt-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2FEDC9562CF0E6B70051EFC4 /* Zone-Hunt-Info.plist */; };
 		C406272D2C9C7A8B0016DFD0 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C406272C2C9C7A8B0016DFD0 /* FirebaseAnalytics */; };
 		C406272F2C9C7A8B0016DFD0 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = C406272E2C9C7A8B0016DFD0 /* FirebaseAnalyticsOnDeviceConversion */; };
 		C40627312C9C7A8B0016DFD0 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = C40627302C9C7A8B0016DFD0 /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -72,6 +74,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2FEDC9542CF0E54A0051EFC4 /* SignInGoogleHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInGoogleHelper.swift; sourceTree = SOURCE_ROOT; };
+		2FEDC9562CF0E6B70051EFC4 /* Zone-Hunt-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Zone-Hunt-Info.plist"; sourceTree = "<group>"; };
 		C406275A2C9DC5B70016DFD0 /* AuthenticationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuthenticationView.swift; path = "Zone Hunt/Authentication/AuthenticationView.swift"; sourceTree = SOURCE_ROOT; };
 		C406275C2C9DC5D90016DFD0 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		C406275E2C9DC5FE0016DFD0 /* SignInEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInEmailView.swift; sourceTree = "<group>"; };
@@ -155,6 +159,7 @@
 		C421B60B2CAAF27E0092CD51 /* Authentication */ = {
 			isa = PBXGroup;
 			children = (
+				2FEDC9542CF0E54A0051EFC4 /* SignInGoogleHelper.swift */,
 				C484C64F2C909954001AEC91 /* SettingsView.swift */,
 				C406275A2C9DC5B70016DFD0 /* AuthenticationView.swift */,
 				C406275C2C9DC5D90016DFD0 /* AuthenticationManager.swift */,
@@ -195,6 +200,7 @@
 		C484C6242C909888001AEC91 /* Zone Hunt */ = {
 			isa = PBXGroup;
 			children = (
+				2FEDC9562CF0E6B70051EFC4 /* Zone-Hunt-Info.plist */,
 				C484C6252C909888001AEC91 /* Zone_HuntApp.swift */,
 				C484C6272C909888001AEC91 /* ContentView.swift */,
 				C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */,
@@ -374,6 +380,7 @@
 				C484C62D2C90988A001AEC91 /* Preview Assets.xcassets in Resources */,
 				C484C62A2C90988A001AEC91 /* Assets.xcassets in Resources */,
 				C421B6122CAC47070092CD51 /* GoogleService-Info.plist in Resources */,
+				2FEDC9572CF0E6B70051EFC4 /* Zone-Hunt-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +414,7 @@
 				C406275D2C9DC5D90016DFD0 /* AuthenticationManager.swift in Sources */,
 				C484C6542C9099B6001AEC91 /* MapView.swift in Sources */,
 				C421B6142CB429A10092CD51 /* EditGameSettings.swift in Sources */,
+				2FEDC9552CF0E54A0051EFC4 /* SignInGoogleHelper.swift in Sources */,
 				C484C6282C909888001AEC91 /* ContentView.swift in Sources */,
 				C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */,
 				C406275B2C9DC5B70016DFD0 /* AuthenticationView.swift in Sources */,
