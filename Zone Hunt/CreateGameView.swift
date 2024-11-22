@@ -1,10 +1,3 @@
-//
-//  CreateGameView.swift
-//  Zone Hunt
-//
-//  Created by Liam Colton on 9/17/24.
-//
-
 import SwiftUI
 import MapKit
 struct CreateGameView: View {
@@ -27,12 +20,11 @@ struct CreateGameView: View {
                     .font(.system(size: 34, weight: .heavy))
                     .foregroundColor(.white)
                     .padding(22)
-
                     .padding(.top, 55)
                     
                 Spacer()
                 
-                NavigationLink(destination: EditGameSettings())  {
+                NavigationLink(destination: EditGameSettings(gameView: self))  {
                     Text("Edit Game Settings")
                         .font(.title2)
                         .fontWeight(.heavy)
@@ -79,7 +71,6 @@ struct CreateGameView: View {
         }
         return false
     }
-
 struct  CreateGameView_Previews: PreviewProvider {
     static var previews: some View {
         CreateGameView()
