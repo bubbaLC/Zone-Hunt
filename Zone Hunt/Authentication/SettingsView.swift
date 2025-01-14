@@ -9,12 +9,21 @@ import SwiftUI
 @MainActor
 final class SettingsViewModel: ObservableObject {
     
+    @Published var authProviders: [AuthProviderOption] = []
+    
+    func loadAuthProviders() {
+        do {
+            authProviders = try AuthenticationManager.shared.getProviders()
+        } catch {
+            print("Failed to load auth providers: \(error)")
+        }
+    }
     
     func signOut() throws {
         try AuthenticationManager.shared.signOut()
     }
     
-    func resetPassword() async throws{
+    func resetPassword() async throws {
         let authUser = try AuthenticationManager.shared.getAuthenticationUser()
         
         guard let email = authUser.email else {
@@ -24,7 +33,7 @@ final class SettingsViewModel: ObservableObject {
     }
     
     func updateEmail() async throws {
-        let email = "hello123@gmail,com"
+        let email = "hello123@gmail.com"
         try await AuthenticationManager.shared.updateEmail(email: email)
     }
     
@@ -55,6 +64,7 @@ struct SettingsView: View {
                 }
                 Spacer()
             }
+            
             Text("Settings")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -73,7 +83,7 @@ struct SettingsView: View {
                 .font(.subheadline)
                 .padding(.top, 10)
             // Account Settings Button
-            NavigationLink(destination: AuthenticationView(showSignInView: $showSignInView)) { // Pass the binding here
+            NavigationLink(destination: AuthenticationView(showSignInView: $showSignInView)) {
                 Text("Account Settings")
                     .font(.headline)
                     .padding()
@@ -82,6 +92,7 @@ struct SettingsView: View {
                     .cornerRadius(10)
                     .padding(.top, 30)
             }
+            
             List {
                 Button("Log out") {
                     Task {
@@ -94,43 +105,47 @@ struct SettingsView: View {
                     }
                 }
                 
-                Section {
-                    Button("Reset password") {
-                        Task {
-                            do {
-                                try await viewModel.resetPassword()
-                                print("PASSWORD RESET!")
-                            } catch {
-                                print(error)
+                if viewModel.authProviders.contains(.email) {
+                    Section {
+                        Button("Reset password") {
+                            Task {
+                                do {
+                                    try await viewModel.resetPassword()
+                                    print("PASSWORD RESET!")
+                                } catch {
+                                    print(error)
+                                }
                             }
                         }
-                    }
-                    Button("Update password") {
-                        Task {
-                            do {
-                                try await viewModel.updatePassword()
-                                print("PASSWORD UPDATED!")
-                            } catch {
-                                print(error)
+                        Button("Update password") {
+                            Task {
+                                do {
+                                    try await viewModel.updatePassword()
+                                    print("PASSWORD UPDATED!")
+                                } catch {
+                                    print(error)
+                                }
                             }
                         }
-                    }
-                    Button("Update email") {
-                        Task {
-                            do {
-                                try await viewModel.updateEmail()
-                                print("EMAIL UPDATED!")
-                            } catch {
-                                print(error)
+                        Button("Update email") {
+                            Task {
+                                do {
+                                    try await viewModel.updateEmail()
+                                    print("EMAIL UPDATED!")
+                                } catch {
+                                    print(error)
+                                }
                             }
                         }
+                    } header: {
+                        Text("Email functions")
                     }
-                } header: {
-                    Text("Email functions")
                 }
-                
-                
             }
+            .onAppear {
+                viewModel.loadAuthProviders()
+            }
+            
             Spacer()
         }
         .background(Color.white.edgesIgnoringSafeArea(.all))
@@ -143,11 +158,7 @@ struct SettingsView: View {
         UserDefaults.standard.set(volume, forKey: "savedVolume")
     }
     private func loadVolume() {
-        if let savedVolume = UserDefaults.standard.object(forKey: "savedVolume") as? Double {
-            volume = savedVolume
-        } else {
-            volume = 0.5
-        }
+        volume = UserDefaults.standard.object(forKey: "savedVolume") as? Double ?? 0.5
     }
 }
 struct SettingsView_Previews: PreviewProvider {
