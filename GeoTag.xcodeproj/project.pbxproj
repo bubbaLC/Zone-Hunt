@@ -52,7 +52,6 @@
 		C484C6412C90988A001AEC91 /* Zone_HuntUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */; };
 		C484C6432C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */; };
 		C484C6502C909954001AEC91 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C64F2C909954001AEC91 /* SettingsView.swift */; };
-		C484C6522C90998A001AEC91 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6512C90998A001AEC91 /* AccountSettingsView.swift */; };
 		C484C6542C9099B6001AEC91 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6532C9099B6001AEC91 /* MapView.swift */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +83,7 @@
 		C421B6112CAC47070092CD51 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C421B6132CB429A10092CD51 /* EditGameSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGameSettings.swift; sourceTree = "<group>"; };
 		C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
+		C4722BD72D4001BF00B205B5 /* Zone-Hunt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Zone-Hunt-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C484C6222C909888001AEC91 /* Zone Hunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zone Hunt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C484C6252C909888001AEC91 /* Zone_HuntApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntApp.swift; sourceTree = "<group>"; };
 		C484C6272C909888001AEC91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -95,7 +95,6 @@
 		C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITests.swift; sourceTree = "<group>"; };
 		C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		C484C64F2C909954001AEC91 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		C484C6512C90998A001AEC91 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		C484C6532C9099B6001AEC91 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -200,6 +199,7 @@
 		C484C6242C909888001AEC91 /* Zone Hunt */ = {
 			isa = PBXGroup;
 			children = (
+				C4722BD72D4001BF00B205B5 /* Zone-Hunt-Info.plist */,
 				2FEDC9562CF0E6B70051EFC4 /* Zone-Hunt-Info.plist */,
 				C484C6252C909888001AEC91 /* Zone_HuntApp.swift */,
 				C484C6272C909888001AEC91 /* ContentView.swift */,
@@ -207,7 +207,6 @@
 				C41373AE2C99CC80009CF569 /* CreateGameView.swift */,
 				C421B6132CB429A10092CD51 /* EditGameSettings.swift */,
 				C484C6532C9099B6001AEC91 /* MapView.swift */,
-				C484C6512C90998A001AEC91 /* AccountSettingsView.swift */,
 				C421B60C2CAC43800092CD51 /* Utilities */,
 				C421B60B2CAAF27E0092CD51 /* Authentication */,
 				C484C6292C90988A001AEC91 /* Assets.xcassets */,
@@ -410,7 +409,6 @@
 				C41373AF2C99CC80009CF569 /* CreateGameView.swift in Sources */,
 				C484C6502C909954001AEC91 /* SettingsView.swift in Sources */,
 				C421B60E2CAC43A40092CD51 /* Utilities.swift in Sources */,
-				C484C6522C90998A001AEC91 /* AccountSettingsView.swift in Sources */,
 				C406275D2C9DC5D90016DFD0 /* AuthenticationManager.swift in Sources */,
 				C484C6542C9099B6001AEC91 /* MapView.swift in Sources */,
 				C421B6142CB429A10092CD51 /* EditGameSettings.swift in Sources */,
@@ -586,6 +584,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Zone-Hunt-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -615,6 +614,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Zone-Hunt-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
