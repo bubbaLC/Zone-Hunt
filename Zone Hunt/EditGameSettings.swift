@@ -1,35 +1,16 @@
-//
-//  EditGameSettings.swift
-//  Zone Hunt
-//
-//  Created by Liam Colton on 10/7/24.
-// test hjftyfdhd
-
 import SwiftUI
 import MapKit
-import CoreLocation
-
+// Rename MapView to GameMapView
 struct GameMapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     @Binding var userTrackingMode: MKUserTrackingMode
     @Binding var radius: Double
-    @Binding var playerLocation: CLLocationCoordinate2D? // Player's current location
-    
-    let locationManager = CLLocationManager()
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.showsUserLocation = true
         mapView.userTrackingMode = userTrackingMode
         mapView.delegate = context.coordinator
-        locationManager.delegate = context.coordinator
-        locationManager.requestWhenInUseAuthorization()
-
-        if locationManager.authorizationStatus == .authorizedWhenInUse ||
-           locationManager.authorizationStatus == .authorizedAlways {
-            locationManager.startUpdatingLocation()
-        }
-        
         return mapView
     }
     
@@ -40,22 +21,13 @@ struct GameMapView: UIViewRepresentable {
         // Add circle overlay
         let circle = MKCircle(center: region.center, radius: radius)
         uiView.addOverlay(circle)
-        if let playerLocation = playerLocation {
-                   // Remove existing annotations
-                   uiView.removeAnnotations(uiView.annotations)
-
-                   // Create and add a new annotation for the player
-                   let playerAnnotation = MKPointAnnotation()
-                   playerAnnotation.coordinate = playerLocation
-                   uiView.addAnnotation(playerAnnotation)
-               }
     }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
-    class Coordinator: NSObject, MKMapViewDelegate, CLLocationManagerDelegate {
+    class Coordinator: NSObject, MKMapViewDelegate {
         var parent: GameMapView
         
         init(_ parent: GameMapView) {
@@ -68,49 +40,54 @@ struct GameMapView: UIViewRepresentable {
             }
             return MKOverlayRenderer()
         }
-        
-        // Implement CLLocationManagerDelegate methods as needed
     }
 }
-
+// Custom renderer to handle the purple tint outside the circle
 class PurpleTintRenderer: MKOverlayRenderer {
     let circleOverlay: MKCircle
     let mapView: MKMapView
-
     init(circle: MKCircle, mapView: MKMapView) {
         self.circleOverlay = circle
         self.mapView = mapView
         super.init(overlay: circle)
     }
-
     override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
+        // Get the rect of the entire map (visible area) using the mapRect parameter
         let fullMapRect = self.rect(for: mapRect)
-
+        // Fill the entire map with a semi-transparent purple color
         context.setFillColor(UIColor.purple.withAlphaComponent(0.3).cgColor)
         context.fill(fullMapRect)
-
+        // Get the rect for the circle overlay
         let circleRect = self.rect(for: circleOverlay.boundingMapRect)
-
+        // Clear the circle area to make it transparent
         context.setBlendMode(.clear)
         context.fillEllipse(in: circleRect)
-
+        // Restore normal drawing mode and draw the red border
         context.setBlendMode(.normal)
         context.setStrokeColor(UIColor.red.cgColor)
-        context.setLineWidth(300.0)
+        context.setLineWidth(3.0) // Adjust as needed for a visible border
         context.strokeEllipse(in: circleRect)
     }
 }
-
+/* old function */
+//func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+//            if let circleOverlay = overlay as? MKCircle {
+//                let renderer = MKCircleRenderer(circle: circleOverlay)
+//                renderer.strokeColor = .red
+//                renderer.lineWidth = 3
+//                return renderer
+//            }
+//            return MKOverlayRenderer()
+//             }
 struct EditGameSettings: View {
     @Environment(\.dismiss) var dismiss
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), // Example: San Francisco
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
     @State private var userTrackingMode: MKUserTrackingMode = .follow
-    @State private var zoneRadius: Double = 500
-    @State private var playerLocation: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)
+    @State private var zoneRadius: Double = 500 // initial radius in meters
     var body: some View {
         VStack {
             Text("Edit Game Settings")
@@ -118,11 +95,13 @@ struct EditGameSettings: View {
                 .padding(.top, 20)
             
             ZStack {
-                GameMapView(region: $region, userTrackingMode: $userTrackingMode, radius: $zoneRadius, playerLocation: $playerLocation)
+                // Use renamed GameMapView here
+                GameMapView(region: $region, userTrackingMode: $userTrackingMode, radius: $zoneRadius)
                     .frame(height: 300)
                     .cornerRadius(15)
                     .padding()
                 
+                // Text Overlay for zone radius
                 VStack {
                     Spacer()
                     Text("Radius of Zone Border: \(Int(zoneRadius)) meters")
@@ -131,12 +110,14 @@ struct EditGameSettings: View {
                 }
             }
             
-            Slider(value: $zoneRadius, in: 100...2000, step: 50)
+            // Adjustable Slider for Zone Radius
+            Slider(value: $zoneRadius, in: 100...2000, step: 50) // Slider range from 100m to 2000m
                 .accentColor(.red)
                 .padding()
             Button(action: {
-                dismiss()
-            }) {
+                            // Dismiss the current view when this button is tapped
+                            dismiss()
+                        }){
                 Text("Save Settings")
                     .font(.title2)
                     .fontWeight(.heavy)
@@ -146,15 +127,21 @@ struct EditGameSettings: View {
                     .background(Color.green)
                     .cornerRadius(10)
                     .padding(.horizontal, 25)
-                    .padding(.top, 10)
+                    .padding(.top,10)
                     .padding(.bottom, 65)
             }
         }
+        // .navigationBarHidden(true)
     }
+    
+    private var gameView: CreateGameView
+    init(gameView: CreateGameView) {
+        self.gameView = gameView;
+    }
+    
 }
-
 struct EditGameSettings_Previews: PreviewProvider {
     static var previews: some View {
-        EditGameSettings()
+        EditGameSettings(gameView: CreateGameView())
     }
 }
