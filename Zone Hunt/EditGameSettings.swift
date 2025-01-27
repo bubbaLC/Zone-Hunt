@@ -65,7 +65,7 @@ class PurpleTintRenderer: MKOverlayRenderer {
         // Restore normal drawing mode and draw the red border
         context.setBlendMode(.normal)
         context.setStrokeColor(UIColor.red.cgColor)
-        context.setLineWidth(3.0) // Adjust as needed for a visible border
+        context.setLineWidth(300.0) // Adjust as needed for a visible border
         context.strokeEllipse(in: circleRect)
     }
 }
