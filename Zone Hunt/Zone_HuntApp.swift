@@ -77,6 +77,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
 import GoogleSignIn
 // Define the AppDelegate to handle Firebase configuration
 class AppDelegate: NSObject, UIApplicationDelegate {
