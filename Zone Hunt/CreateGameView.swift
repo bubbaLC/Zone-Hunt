@@ -10,6 +10,8 @@ struct CreateGameView: View {
     )
     @State private var userTrackingMode: MKUserTrackingMode = .follow
     @State private var isLoading = false
+    @State private var radius: Double = 500.0 // Default radius value
+    
     private let db = Firestore.firestore()
 
     var body: some View {
@@ -66,16 +68,19 @@ struct CreateGameView: View {
     
     func startGame() {
         isLoading = true
+        // Get host ID from UserDefaults
+        let hostId = UserDefaults.standard.string(forKey: "userId") ?? ""
+        
         let gameData: [String: Any] = [
             "gameCode": gameCode,
             "createdAt": Timestamp(),
-            "users": [], // Empty array initially
-            "region": [
-                "latitude": region.center.latitude,
-                "longitude": region.center.longitude,
-                "latitudeDelta": region.span.latitudeDelta,
-                "longitudeDelta": region.span.longitudeDelta
-            ]
+            "users": [hostId], // Add host to users array initially
+            "hostLocation": [region.center.latitude, region.center.longitude],
+            "zoneRadius": radius,
+            "gameState": "waiting",
+            "hostId": hostId,
+            "lobbyChat": [],
+            "lobbyId": UUID().uuidString
         ]
         
         db.collection("lobbies").document("\(gameCode)").setData(gameData) { error in
@@ -83,7 +88,7 @@ struct CreateGameView: View {
             if let error = error {
                 print("Error creating game: \(error.localizedDescription)")
             } else {
-                print("Game created successfully!")
+                print("Game created successfully with host in users array!")
             }
         }
     }
