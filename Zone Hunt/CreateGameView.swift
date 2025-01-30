@@ -11,7 +11,8 @@ struct CreateGameView: View {
     @State private var userTrackingMode: MKUserTrackingMode = .follow
     @State private var isLoading = false
     @State private var radius: Double = 500.0 // Default radius value
-    
+    @State private var lobbyCreated = false // Track if the lobby has already been created
+
     private let db = Firestore.firestore()
 
     var body: some View {
@@ -62,13 +63,16 @@ struct CreateGameView: View {
             .navigationBarHidden(true)
         }
         .onAppear {
-            gameCode = generateUniqueGameCode()
+            if !lobbyCreated { // Prevent duplicate lobby creation
+                gameCode = generateUniqueGameCode()
+                createLobby()
+            }
         }
     }
     
-    func startGame() {
-        isLoading = true
-        // Get host ID from UserDefaults
+    func createLobby() {
+        lobbyCreated = true // Mark that the lobby is created
+
         let hostId = UserDefaults.standard.string(forKey: "userId") ?? ""
         
         let gameData: [String: Any] = [
@@ -84,11 +88,24 @@ struct CreateGameView: View {
         ]
         
         db.collection("lobbies").document("\(gameCode)").setData(gameData) { error in
-            isLoading = false
             if let error = error {
                 print("Error creating game: \(error.localizedDescription)")
             } else {
-                print("Game created successfully with host in users array!")
+                print("Lobby created immediately when entering CreateGameView!")
+            }
+        }
+    }
+
+    func startGame() {
+        isLoading = true
+        db.collection("lobbies").document("\(gameCode)").updateData([
+            "gameState": "active"
+        ]) { error in
+            isLoading = false
+            if let error = error {
+                print("Error starting game: \(error.localizedDescription)")
+            } else {
+                print("Game state updated to 'active'!")
             }
         }
     }
