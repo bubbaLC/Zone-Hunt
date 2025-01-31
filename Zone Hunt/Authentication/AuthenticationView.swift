@@ -15,42 +15,39 @@ import FirebaseFirestore
 final class AuthenticationViewModel: ObservableObject {
     
     private let db = Firestore.firestore()
-    
-    // Function to sign in with Google
+
     func signInGoogle() async throws {
         let helper = SignInGoogleHelper()
         let tokens = try await helper.signIn()
-        
-        // Create credential directly without optional binding
+
         let credential = GoogleAuthProvider.credential(withIDToken: tokens.idToken, accessToken: tokens.accessToken)
         let authResult = try await Auth.auth().signIn(with: credential)
         let user = authResult.user
-        
-        // Add user to Firestore
+
+        // Store user ID in UserDefaults
+        UserDefaults.standard.set(user.uid, forKey: "userId")
+
         try await addUserToFirestore(uid: user.uid, email: user.email ?? "guest@example.com")
     }
-    
-    // Function to add user to Firestore
+
     private func addUserToFirestore(uid: String, email: String) async throws {
         let userDocument = db.collection("users").document(uid)
-        
+
         let data: [String: Any] = [
             "uid": uid,
-            "name": "guest", // Placeholder for username
+            "name": "guest",
             "currentLobbyId": "",
-            "inLobby": false
+            "inLobby": false,
+            "email": email
         ]
-        
-        // Check if user document already exists
+
         let document = try await userDocument.getDocument()
         if !document.exists {
             try await userDocument.setData(data)
-            print("User added to Firestore with UID: \(uid)")
-        } else {
-            print("User already exists in Firestore")
         }
     }
 }
+
 
 struct AuthenticationView: View {
     
