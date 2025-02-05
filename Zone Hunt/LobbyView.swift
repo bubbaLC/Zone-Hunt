@@ -10,13 +10,43 @@ import FirebaseFirestore
 
 struct LobbyView: View {
     @State private var gameCode: String = ""
-    @State private var isCreatingGame = false
-    @State private var isJoiningGame = false
+    //    @State private var isCreatingGame = false
+    //    @State private var isJoiningGame = false
+    @State private var navigateToLobbyDetail = false  // Used for programmatic navigation
+    @State private var errorMessage: String? // Add error handling
+    
     let charLimit = 6
     
+    /// Adds the current user's ID to the lobby's "users" field.
+    func joinLobby(lobbyId: String) {
+        let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
+        let lobbyRef = Firestore.firestore().collection("lobbies").document(lobbyId)
+        
+        // First check if lobby exists
+        lobbyRef.getDocument { snapshot, error in
+            guard snapshot?.exists == true else {
+                DispatchQueue.main.async {
+                    self.errorMessage = "Lobby not found." // Show error
+                }
+                return
+            }
+            
+            // Add user to lobby
+            lobbyRef.updateData(["users": FieldValue.arrayUnion([userId])]) { error in
+                DispatchQueue.main.async {
+                    if error == nil {
+                        navigateToLobbyDetail = true // Trigger navigation
+                    } else {
+                        self.errorMessage = "Failed to join. Try again."
+                    }
+                }
+            }
+        }
+    }
+    
     var body: some View {
-        NavigationView {
-            ZStack{
+        NavigationStack {
+            ZStack {
                 Image("BackgroundImage")
                     .resizable()
                     .scaledToFill()
@@ -33,8 +63,8 @@ struct LobbyView: View {
                     Spacer()
                     Spacer()
                     Spacer()
-
-                    // Create Game Button
+                    
+                    // Create Game Button (navigates to CreateGameView)
                     NavigationLink(destination: CreateGameView()) {
                         Text("Create Game")
                             .font(.title2)
@@ -46,23 +76,21 @@ struct LobbyView: View {
                             .cornerRadius(10)
                     }
                     .padding(.horizontal)
-
+                    
                     TextField("Enter Game Code", text: $gameCode)
                         .keyboardType(.numberPad)
-                        .onChange(of: gameCode) {
-                            if gameCode.count > charLimit {
-                                gameCode = String(gameCode.prefix(charLimit))
+                        .onChange(of: gameCode) { newValue, _ in
+                            if newValue.count > charLimit {
+                                gameCode = String(newValue.prefix(charLimit))
                             }
                         }
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal, 17)
                         .padding(.vertical, 5)
                         .cornerRadius(10)
-
+                    
                     // Join Game Button
-                    Button(action: {
-                        joinLobby(lobbyId: gameCode)
-                    }) {
+                    Button(action: { joinLobby(lobbyId: gameCode) }) {
                         Text("Join Game")
                             .font(.title2)
                             .fontWeight(.semibold)
@@ -76,33 +104,21 @@ struct LobbyView: View {
                     .disabled(gameCode.isEmpty)
                     
                     Spacer()
+                    
+                    // Hidden NavigationLink for programmatic navigation to the LobbyDetailView.
+                    .navigationDestination(isPresented: $navigateToLobbyDetail) {
+                        LobbyDetailView(lobbyId: gameCode)
+                    }
                 }
             }
         }
     }
-
-    func joinLobby(lobbyId: String) {
-        let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
-        let lobbyRef = Firestore.firestore().collection("lobbies").document(lobbyId)
-
-        lobbyRef.updateData([
-            "users": FieldValue.arrayUnion([userId])
-        ]) { error in
-            if let error = error {
-                print("Error joining lobby: \(error.localizedDescription)")
-            } else {
-                print("User \(userId) joined lobby \(lobbyId)")
-                isJoiningGame = true // Update UI state if needed
-            }
+    
+    struct LobbyView_Previews: PreviewProvider {
+        static var previews: some View {
+            LobbyView()
         }
     }
 }
-
-struct LobbyView_Previews: PreviewProvider {
-    static var previews: some View {
-        LobbyView()
-    }
-}
-
 
 
