@@ -48,7 +48,6 @@ final class AuthenticationViewModel: ObservableObject {
     }
 }
 
-
 struct AuthenticationView: View {
     
     @StateObject private var viewModel = AuthenticationViewModel()
@@ -56,6 +55,20 @@ struct AuthenticationView: View {
     
     var body: some View {
         VStack {
+            
+            
+
+            NavigationLink {
+                CreateUserView()
+            } label: {
+                Text("Create a GeoTag Account")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(height: 55)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .cornerRadius(10)
+            }
             
             NavigationLink {
                 SigninEmailView(showSignInView: $showSignInView)
@@ -68,9 +81,9 @@ struct AuthenticationView: View {
                     .background(Color.blue)
                     .cornerRadius(10)
             }
-            
+
             GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(scheme: .dark, style: .wide, state: .normal)) {
-                Task{
+                Task {
                     do {
                         try await viewModel.signInGoogle()
                         showSignInView = false
@@ -86,12 +99,11 @@ struct AuthenticationView: View {
         .navigationTitle("Sign In")
     }
 }
+
 struct AuthenticationView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack{
+        NavigationStack {
             AuthenticationView(showSignInView: .constant(true))
         }
     }
 }
-
-

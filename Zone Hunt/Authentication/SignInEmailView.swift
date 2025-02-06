@@ -6,30 +6,71 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
+
 @MainActor
 final class SignInEmailViewModel: ObservableObject {
     
     @Published var email = ""
     @Published var password = ""
+    @Published var errorMessage: String?
+    @Published var showError: Bool = false
+    @Published var username: String? // Store username after sign-in
     
-    func signUp() async throws {
+    private let db = Firestore.firestore()
+    
+    func signIn() async {
         guard !email.isEmpty, !password.isEmpty else {
-            print("No email or password found.")
+            errorMessage = "No email or password found."
+            showError = true
             return
         }
         
-        try await AuthenticationManager.shared.createUser(email: email, password: password)
+        do {
+            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
+            let userId = authResult.user.uid
+            
+            if let fetchedUsername = await fetchUsername(for: userId) {
+                username = fetchedUsername
+            } else {
+                return
+            }
+            // If sign-in is successful, set error message to nil
+            errorMessage = nil
+        } catch let authError as NSError {
+            switch authError.code {
+            case AuthErrorCode.userNotFound.rawValue:
+                errorMessage = "No account found for this email."
+            case AuthErrorCode.wrongPassword.rawValue:
+                errorMessage = "Incorrect password."
+            case AuthErrorCode.invalidEmail.rawValue:
+                errorMessage = "Invalid email format."
+            default:
+                errorMessage = "Sign-in failed: \(authError.localizedDescription)"
+            }
+            showError = true
+        }
     }
     
-    func signIn() async throws {
-        guard !email.isEmpty, !password.isEmpty else {
-            print("No email or password found.")
-            return
+    func fetchUsername(for userId: String) async -> String? {
+        do {
+            let document = try await db.collection("users").document(userId).getDocument()
+            if let data = document.data(), let fetchedUsername = data["username"] as? String {
+                return fetchedUsername
+            } else {
+                errorMessage = "No username found. Please set up a username."
+                showError = true
+                return nil
+            }
+        } catch {
+            errorMessage = "Error fetching user data: \(error.localizedDescription)"
+            showError = true
+            return nil
         }
-        
-        try await AuthenticationManager.shared.signInUser(email: email, password: password)
     }
 }
+
 struct SigninEmailView: View {
     
     @StateObject private var viewModel = SignInEmailViewModel()
@@ -48,22 +89,10 @@ struct SigninEmailView: View {
             
             Button {
                 Task {
-                    do {
-                        try await viewModel.signUp()
-                        showSignInView = false
-                        return
-                    } catch {
-                        print(error)
+                    await viewModel.signIn()
+                    if viewModel.errorMessage == nil {
+                        showSignInView = false // Navigate back to the authentication view
                     }
-                    do {
-                        try await viewModel.signIn()
-                        showSignInView = false
-                        return
-                    } catch {
-                        print(error)
-                    }
-                    
-                    
                 }
             } label: {
                 Text("Sign In")
@@ -74,20 +103,21 @@ struct SigninEmailView: View {
                     .background(Color.blue)
                     .cornerRadius(10)
             }
+            .alert(isPresented: $viewModel.showError) {
+                Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? "Unknown error"), dismissButton: .default(Text("OK")))
+            }
             
             Spacer()
         }
         .padding()
         .navigationTitle("Sign In With Email")
-        
     }
 }
+
 struct SigninEmailView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack{
+        NavigationStack {
             SigninEmailView(showSignInView: .constant(false))
         }
     }
 }
-
-
