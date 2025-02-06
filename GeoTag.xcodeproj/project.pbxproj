@@ -45,6 +45,9 @@
 		C45F59E52C91E8F4002C7CA4 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */; };
 		C460778A2C948DAA002C84D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C484C6292C90988A001AEC91 /* Assets.xcassets */; };
 		C460778B2C948DAA002C84D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C484C6292C90988A001AEC91 /* Assets.xcassets */; };
+		C4722BD92D52733A00B205B5 /* JoinGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4722BD82D52733A00B205B5 /* JoinGameView.swift */; };
+		C4722BDB2D52737900B205B5 /* LobbyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4722BDA2D52737900B205B5 /* LobbyDetailView.swift */; };
+		C4722BDD2D52744C00B205B5 /* LobbyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4722BDC2D52744C00B205B5 /* LobbyData.swift */; };
 		C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6252C909888001AEC91 /* Zone_HuntApp.swift */; };
 		C484C6282C909888001AEC91 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C484C6272C909888001AEC91 /* ContentView.swift */; };
 		C484C62A2C90988A001AEC91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C484C6292C90988A001AEC91 /* Assets.xcassets */; };
@@ -86,6 +89,9 @@
 		C421B6132CB429A10092CD51 /* EditGameSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGameSettings.swift; sourceTree = "<group>"; };
 		C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
 		C4722BD72D4001BF00B205B5 /* Zone-Hunt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Zone-Hunt-Info.plist"; sourceTree = SOURCE_ROOT; };
+		C4722BD82D52733A00B205B5 /* JoinGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGameView.swift; sourceTree = "<group>"; };
+		C4722BDA2D52737900B205B5 /* LobbyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyDetailView.swift; sourceTree = "<group>"; };
+		C4722BDC2D52744C00B205B5 /* LobbyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyData.swift; sourceTree = "<group>"; };
 		C484C6222C909888001AEC91 /* Zone Hunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zone Hunt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C484C6252C909888001AEC91 /* Zone_HuntApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntApp.swift; sourceTree = "<group>"; };
 		C484C6272C909888001AEC91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -207,6 +213,9 @@
 				C484C6252C909888001AEC91 /* Zone_HuntApp.swift */,
 				C484C6272C909888001AEC91 /* ContentView.swift */,
 				C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */,
+				C4722BD82D52733A00B205B5 /* JoinGameView.swift */,
+				C4722BDC2D52744C00B205B5 /* LobbyData.swift */,
+				C4722BDA2D52737900B205B5 /* LobbyDetailView.swift */,
 				C41373AE2C99CC80009CF569 /* CreateGameView.swift */,
 				C421B6132CB429A10092CD51 /* EditGameSettings.swift */,
 				C484C6532C9099B6001AEC91 /* MapView.swift */,
@@ -417,10 +426,13 @@
 				C484C6542C9099B6001AEC91 /* MapView.swift in Sources */,
 				C421B6142CB429A10092CD51 /* EditGameSettings.swift in Sources */,
 				2FEDC9552CF0E54A0051EFC4 /* SignInGoogleHelper.swift in Sources */,
+				C4722BD92D52733A00B205B5 /* JoinGameView.swift in Sources */,
 				C484C6282C909888001AEC91 /* ContentView.swift in Sources */,
 				C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */,
 				C406275B2C9DC5B70016DFD0 /* AuthenticationView.swift in Sources */,
 				C45F59E52C91E8F4002C7CA4 /* LobbyView.swift in Sources */,
+				C4722BDB2D52737900B205B5 /* LobbyDetailView.swift in Sources */,
+				C4722BDD2D52744C00B205B5 /* LobbyData.swift in Sources */,
 				C406275F2C9DC5FE0016DFD0 /* SignInEmailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

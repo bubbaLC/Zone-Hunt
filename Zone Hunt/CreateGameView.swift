@@ -104,8 +104,7 @@ struct CreateGameView: View {
         }
         .onAppear {
             if !lobbyCreated {
-                gameCode = generateUniqueGameCode()
-                createLobby()
+                createLobby() // Generate code and create lobby
             }
         }
         .onDisappear {
@@ -113,32 +112,65 @@ struct CreateGameView: View {
         }
     }
 
+    // MARK: - Firestore Logic
     func createLobby() {
         lobbyCreated = true
         let hostId = UserDefaults.standard.string(forKey: "userId") ?? ""
-        lobbyId = UUID().uuidString
-
+        
+        // Generate a unique game code and use it as the document ID
+        generateUniqueGameCode { code in
+            guard let code = code else {
+                print("Failed to generate unique code")
+                return
+            }
+                
+        self.gameCode = code
+        let gameCodeString = String(code)
+                
         let gameData: [String: Any] = [
-            "gameCode": gameCode,
+            "gameCode": code,
             "createdAt": Timestamp(),
-            "users": [hostId], // Host is the first user
+            "users": [hostId],
             "hostLocation": [region.center.latitude, region.center.longitude],
             "zoneRadius": radius,
             "gameState": "waiting",
             "hostId": hostId,
-            "lobbyChat": [],
-            "lobbyId": lobbyId
-        ]
-
-        db.collection("lobbies").document(lobbyId).setData(gameData) { error in
-            if let error = error {
-                print("Error creating game: \(error.localizedDescription)")
-            } else {
-                print("Lobby created!")
-                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId)
+            "lobbyChat": []
+                ]
+                
+            // Set document ID = game code
+            db.collection("lobbies").document(gameCodeString).setData(gameData) { error in
+                if let error = error {
+                    print("Error creating game: \(error.localizedDescription)")
+                } else {
+                    print("Lobby created with code \(code)!")
+                    lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
+                    lobbyId = gameCodeString}
+                }
             }
         }
-    }
+
+        // Generate code with Firestore uniqueness check
+        func generateUniqueGameCode(completion: @escaping (Int?) -> Void) {
+            let maxAttempts = 5
+            var attempts = 0
+            
+            func generateCode() {
+                let code = Int.random(in: 100000..<999999)
+                let codeString = String(code)
+                
+                db.collection("lobbies").document(codeString).getDocument { snapshot, _ in
+                    if snapshot?.exists == true && attempts < maxAttempts {
+                        attempts += 1
+                        generateCode() // Retry if code exists
+                    } else {
+                        completion(code)
+                    }
+                }
+            }
+            
+            generateCode()
+        }
 
     func startGame() {
         isLoading = true
