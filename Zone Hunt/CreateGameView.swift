@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import FirebaseFirestore
+import FirebaseAuth
 
 class LobbyViewModel: ObservableObject {
     @Published var users: [String] = []
@@ -8,6 +9,8 @@ class LobbyViewModel: ObservableObject {
     private var listener: ListenerRegistration?
 
     func listenForLobbyUpdates(lobbyId: String) {
+        guard listener == nil else { return } // Prevent multiple listeners
+
         listener = db.collection("lobbies").document(lobbyId).addSnapshotListener { document, error in
             guard let document = document, document.exists else {
                 print("Lobby document does not exist")
@@ -24,6 +27,7 @@ class LobbyViewModel: ObservableObject {
     
     func stopListening() {
         listener?.remove()
+        listener = nil
     }
 }
 
@@ -33,7 +37,6 @@ struct CreateGameView: View {
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
-    @State private var userTrackingMode: MKUserTrackingMode = .follow
     @State private var isLoading = false
     @State private var radius: Double = 500.0
     @State private var lobbyCreated = false
@@ -51,10 +54,9 @@ struct CreateGameView: View {
                 .edgesIgnoringSafeArea(.all)
 
             VStack {
-                Text("Game Code: \(String(gameCode))")
+                Text("Game Code: \(String(gameCode))") // Ensures no commas
                     .font(.system(size: 34, weight: .heavy))
                     .foregroundColor(.white)
-                    .padding(22)
                     .padding(.top, 55)
 
                 Spacer()
@@ -83,9 +85,7 @@ struct CreateGameView: View {
                         .padding(.horizontal, 25)
                 }
 
-                Button(action: {
-                    startGame()
-                }) {
+                Button(action: startGame) {
                     Text("Start Game")
                         .font(.title2)
                         .fontWeight(.heavy)
@@ -104,7 +104,7 @@ struct CreateGameView: View {
         }
         .onAppear {
             if !lobbyCreated {
-                createLobby() // Generate code and create lobby
+                createLobby()
             }
         }
         .onDisappear {
@@ -114,97 +114,87 @@ struct CreateGameView: View {
 
     // MARK: - Firestore Logic
     func createLobby() {
-        lobbyCreated = true
-        let hostId = UserDefaults.standard.string(forKey: "userId") ?? ""
+        guard let user = Auth.auth().currentUser else {
+            print("User not authenticated")
+            return
+        }
         
-        // Generate a unique game code and use it as the document ID
+        lobbyCreated = true
+        let hostId = user.uid
+        
         generateUniqueGameCode { code in
             guard let code = code else {
                 print("Failed to generate unique code")
                 return
             }
-                
-        self.gameCode = code
-        let gameCodeString = String(code)
-                
-        let gameData: [String: Any] = [
-            "gameCode": code,
-            "createdAt": Timestamp(),
-            "users": [hostId],
-            "hostLocation": [region.center.latitude, region.center.longitude],
-            "zoneRadius": radius,
-            "gameState": "waiting",
-            "hostId": hostId,
-            "lobbyChat": []
-                ]
-                
-            // Set document ID = game code
+            
+            DispatchQueue.main.async {
+                self.gameCode = code
+            }
+            
+            let gameCodeString = "\(code)" // Ensures consistent Firestore storage
+            let gameData: [String: Any] = [
+                "gameCode": code,
+                "createdAt": Timestamp(),
+                "users": [hostId],
+                "hostLocation": [region.center.latitude, region.center.longitude],
+                "zoneRadius": radius,
+                "gameState": "waiting",
+                "hostId": hostId,
+                "lobbyChat": []
+            ]
+            
             db.collection("lobbies").document(gameCodeString).setData(gameData) { error in
                 if let error = error {
                     print("Error creating game: \(error.localizedDescription)")
                 } else {
                     print("Lobby created with code \(code)!")
-                    lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
-                    lobbyId = gameCodeString}
+                    DispatchQueue.main.async {
+                        self.lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
+                        self.lobbyId = gameCodeString
+                    }
+                }
+            }
+        }
+    }
+
+    func generateUniqueGameCode(completion: @escaping (Int?) -> Void) {
+        let maxAttempts = 5
+        var attempts = 0
+
+        func generateCode() {
+            let code = Int.random(in: 100000..<999999)
+            let codeString = String(code)
+
+            db.collection("lobbies").document(codeString).getDocument { snapshot, _ in
+                if snapshot?.exists == true, attempts < maxAttempts {
+                    attempts += 1
+                    generateCode()
+                } else {
+                    completion(snapshot?.exists == true ? nil : code)
                 }
             }
         }
 
-        // Generate code with Firestore uniqueness check
-        func generateUniqueGameCode(completion: @escaping (Int?) -> Void) {
-            let maxAttempts = 5
-            var attempts = 0
-            
-            func generateCode() {
-                let code = Int.random(in: 100000..<999999)
-                let codeString = String(code)
-                
-                db.collection("lobbies").document(codeString).getDocument { snapshot, _ in
-                    if snapshot?.exists == true && attempts < maxAttempts {
-                        attempts += 1
-                        generateCode() // Retry if code exists
-                    } else {
-                        completion(code)
-                    }
-                }
-            }
-            
-            generateCode()
-        }
+        generateCode()
+    }
 
     func startGame() {
         isLoading = true
         db.collection("lobbies").document(lobbyId).updateData([
             "gameState": "active"
         ]) { error in
-            isLoading = false
-            if let error = error {
-                print("Error starting game: \(error.localizedDescription)")
-            } else {
-                print("Game started!")
+            DispatchQueue.main.async {
+                self.isLoading = false
+                if let error = error {
+                    print("Error starting game: \(error.localizedDescription)")
+                } else {
+                    print("Game started!")
+                }
             }
         }
-    }
-
-    func generateUniqueGameCode() -> Int {
-        var code = Int.random(in: 100000..<999999)
-        while hasAdjacentEqualDigits(code: code) {
-            code = Int.random(in: 100000..<999999)
-        }
-        return code
-    }
-
-    func hasAdjacentEqualDigits(code: Int) -> Bool {
-        let digits = Array(String(code))
-        for i in 0..<digits.count - 1 {
-            if digits[i] == digits[i + 1] {
-                return true
-            }
-        }
-        return false
     }
 }
-
 
 struct CreateGameView_Previews: PreviewProvider {
     static var previews: some View {
