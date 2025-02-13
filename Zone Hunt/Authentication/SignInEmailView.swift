@@ -33,6 +33,9 @@ final class SignInEmailViewModel: ObservableObject {
             
             if let fetchedUsername = await fetchUsername(for: userId) {
                 username = fetchedUsername
+                // Store username and userId in UserDefaults
+                UserDefaults.standard.set(fetchedUsername, forKey: "username")
+                UserDefaults.standard.set(userId, forKey: "userId")
             } else {
                 return
             }
@@ -74,7 +77,7 @@ final class SignInEmailViewModel: ObservableObject {
 struct SigninEmailView: View {
     
     @StateObject private var viewModel = SignInEmailViewModel()
-    @Binding var showSignInView: Bool
+    @Environment(\.presentationMode) var presentationMode // Access the presentation mode
     
     var body: some View {
         VStack {
@@ -82,6 +85,9 @@ struct SigninEmailView: View {
                 .padding()
                 .background(Color.gray.opacity(0.4))
                 .cornerRadius(10)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
             SecureField("Password...", text: $viewModel.password)
                 .padding()
                 .background(Color.gray.opacity(0.4))
@@ -91,7 +97,8 @@ struct SigninEmailView: View {
                 Task {
                     await viewModel.signIn()
                     if viewModel.errorMessage == nil {
-                        showSignInView = false // Navigate back to the authentication view
+                        // Dismiss the view upon successful sign-in
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             } label: {
@@ -104,7 +111,9 @@ struct SigninEmailView: View {
                     .cornerRadius(10)
             }
             .alert(isPresented: $viewModel.showError) {
-                Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? "Unknown error"), dismissButton: .default(Text("OK")))
+                Alert(title: Text("Error"),
+                      message: Text(viewModel.errorMessage ?? "Unknown error"),
+                      dismissButton: .default(Text("OK")))
             }
             
             Spacer()
@@ -117,7 +126,7 @@ struct SigninEmailView: View {
 struct SigninEmailView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            SigninEmailView(showSignInView: .constant(false))
+            SigninEmailView()
         }
     }
 }

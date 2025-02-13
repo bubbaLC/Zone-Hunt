@@ -28,14 +28,29 @@ final class AuthenticationViewModel: ObservableObject {
         UserDefaults.standard.set(user.uid, forKey: "userId")
 
         try await addUserToFirestore(uid: user.uid, email: user.email ?? "guest@example.com")
+        
+        // Fetch and store username
+        await fetchAndStoreUsername(for: user.uid)
     }
-
+    
+    private func fetchAndStoreUsername(for userId: String) async {
+        do {
+            let document = try await db.collection("users").document(userId).getDocument()
+            if let data = document.data(), let fetchedUsername = data["username"] as? String {
+                // Store username in UserDefaults
+                UserDefaults.standard.set(fetchedUsername, forKey: "username")
+            }
+        } catch {
+            print("Error fetching username: \(error)")
+        }
+    }
+    
     private func addUserToFirestore(uid: String, email: String) async throws {
         let userDocument = db.collection("users").document(uid)
 
         let data: [String: Any] = [
             "uid": uid,
-            "name": "guest",
+            "username": "Guest",  // Changed from "name" to "username" for consistency
             "currentLobbyId": "",
             "inLobby": false,
             "email": email
@@ -53,11 +68,22 @@ struct AuthenticationView: View {
     @StateObject private var viewModel = AuthenticationViewModel()
     @Binding var showSignInView: Bool
     
+    @State private var isSignedIn: Bool = false
+    @State private var username: String? = nil
+
     var body: some View {
         VStack {
             
+            if isSignedIn, let username = username {
+                Text("Currently signed in as \(username)")
+                    .font(.headline)
+                    .padding()
+            } else {
+                Text("Not signed in")
+                    .font(.headline)
+                    .padding()
+            }
             
-
             NavigationLink {
                 CreateUserView()
             } label: {
@@ -71,7 +97,7 @@ struct AuthenticationView: View {
             }
             
             NavigationLink {
-                SigninEmailView(showSignInView: $showSignInView)
+                SigninEmailView()
             } label: {
                 Text("Sign In With Email")
                     .font(.headline)
@@ -87,6 +113,16 @@ struct AuthenticationView: View {
                     do {
                         try await viewModel.signInGoogle()
                         showSignInView = false
+                        self.isSignedIn = true
+                        // Try to get username from UserDefaults
+                        if let username = UserDefaults.standard.string(forKey: "username") {
+                            self.username = username
+                        } else {
+                            // Fetch from Firestore
+                            if let user = Auth.auth().currentUser {
+                                await fetchUsername(for: user.uid)
+                            }
+                        }
                     } catch {
                         print(error)
                     }
@@ -97,6 +133,41 @@ struct AuthenticationView: View {
         }
         .padding()
         .navigationTitle("Sign In")
+        .onAppear {
+            // Check if user is signed in
+            if let user = Auth.auth().currentUser {
+                self.isSignedIn = true
+                // Try to get username from UserDefaults
+                if let storedUsername = UserDefaults.standard.string(forKey: "username") {
+                    self.username = storedUsername
+                } else {
+                    // Fetch from Firestore
+                    Task {
+                        await fetchUsername(for: user.uid)
+                    }
+                }
+            } else {
+                self.isSignedIn = false
+                self.username = nil
+            }
+        }
+    }
+    
+    func fetchUsername(for userId: String) async {
+        let db = Firestore.firestore()
+        do {
+            let document = try await db.collection("users").document(userId).getDocument()
+            if let data = document.data(), let fetchedUsername = data["username"] as? String {
+                self.username = fetchedUsername
+                // Store in UserDefaults
+                UserDefaults.standard.set(fetchedUsername, forKey: "username")
+            } else {
+                self.username = "Unknown"
+            }
+        } catch {
+            print("Error fetching username: \(error)")
+            self.username = "Unknown"
+        }
     }
 }
 
