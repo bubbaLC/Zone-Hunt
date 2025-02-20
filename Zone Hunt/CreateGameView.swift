@@ -6,6 +6,7 @@ import FirebaseAuth
 class LobbyViewModel: ObservableObject {
     @Published var users: [String] = []
     @Published var messages: [Message] = []
+    @Published var userNames: [String: String] = [:] // Store usernames here
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
 
@@ -13,32 +14,63 @@ class LobbyViewModel: ObservableObject {
         guard listener == nil else { return } // Prevent multiple listeners
 
         listener = db.collection("lobbies").document(lobbyId).addSnapshotListener { document, error in
-            guard let document = document, document.exists else {
-                print("Lobby document does not exist")
+            guard let data = document?.data(), error == nil else {
+                print("Error fetching lobby: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            
-            if let usersArray = document.data()?["users"] as? [String] {
-                DispatchQueue.main.async {
-                    self.users = usersArray
+
+            if let usersArray = data["users"] as? [String] {
+                self.users = usersArray
+                self.fetchUsernames(for: usersArray)
+            }
+
+            if let chatArray = data["lobbyChat"] as? [[String: Any]] {
+                let updatedMessages = chatArray.compactMap { dict -> Message? in
+                    guard let userId = dict["user"] as? String,
+                          let text = dict["message"] as? String,
+                          let timestamp = dict["timestamp"] as? Timestamp else { return nil }
+                    return Message(userId: userId, text: text, timestamp: timestamp)
                 }
-                if let chatArray = document.data()?["lobbyChat"] as? [[String: String]] {
-                    DispatchQueue.main.async {
-                        self.messages = chatArray.compactMap { dict in
-                            guard let user = dict["user"], let text = dict["message"] else { return nil }
-                            return Message(userId: user, text: text)
-                        }
-                    }
-                }
+                DispatchQueue.main.async { self.messages = updatedMessages }
             }
         }
     }
+    private func fetchUsernames(for userIds: [String]) {
+        let group = DispatchGroup()
+
+        userIds.forEach { userId in
+            guard userNames[userId] == nil else { return }
+            group.enter()
+            db.collection("users").document(userId).getDocument { document, error in
+                if let username = document?.data()?["username"] as? String {
+                    DispatchQueue.main.async { self.userNames[userId] = username }
+                } else {
+                    print("Failed to fetch username for \(userId)")
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) { self.updateMessagesWithUsernames() }
+    }
     
+    private func updateMessagesWithUsernames() {
+        DispatchQueue.main.async {
+            self.messages = self.messages.map { message in
+                let updatedUsername = self.userNames[message.userId] ?? "Unknown"
+                return Message(userId: updatedUsername, text: message.text, timestamp: message.timestamp)
+            }
+        }
+    }
     func sendMessage(lobbyId: String, userId: String, message: String) {
         guard !message.trimmingCharacters(in: .whitespaces).isEmpty else { return }
 
-        let newMessage: [String: String] = ["user": userId, "message": message]
-        
+        let newMessage: [String: Any] = [
+            "user": userId,
+            "message": message,
+            "timestamp": Timestamp(date: Date())
+        ]
+
         db.collection("lobbies").document(lobbyId).updateData([
             "lobbyChat": FieldValue.arrayUnion([newMessage])
         ]) { error in
@@ -91,9 +123,15 @@ struct CreateGameView: View {
                     .padding()
 
                 List(lobbyViewModel.users, id: \.self) { userId in
-                    Text(userId)
-                        .font(.headline)
-                        .foregroundColor(.black)
+                    if let username = lobbyViewModel.userNames[userId] {
+                        Text(username) // Show the username
+                            .font(.headline)
+                            .foregroundColor(.black)
+                    } else {
+                        Text("Loading...") // Display a placeholder until the username is fetched
+                            .font(.headline)
+                            .foregroundColor(.black)
+                    }
                 }
                 .frame(height: 150)
                 .frame(height: 150)
@@ -306,9 +344,11 @@ struct CreateGameView: View {
 }
 
 struct Message: Identifiable, Equatable {
-    let id = UUID()  // Ensures uniqueness
     let userId: String
     let text: String
+    var timestamp: Timestamp
+
+    var id: String { "\(userId)_\(timestamp.seconds)" }
 }
 
 struct BlurredBackground: View {
