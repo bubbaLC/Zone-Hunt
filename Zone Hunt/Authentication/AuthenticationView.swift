@@ -15,50 +15,102 @@ import FirebaseFirestore
 final class AuthenticationViewModel: ObservableObject {
     
     private let db = Firestore.firestore()
-
+    
+    @Published var shouldPromptForUsername: Bool = false
+    @Published var username: String? = nil
+    @Published var isSignedIn: Bool = false
+    
     func signInGoogle() async throws {
         let helper = SignInGoogleHelper()
         let tokens = try await helper.signIn()
-
+        
         let credential = GoogleAuthProvider.credential(withIDToken: tokens.idToken, accessToken: tokens.accessToken)
         let authResult = try await Auth.auth().signIn(with: credential)
         let user = authResult.user
-
-        // Store user ID in UserDefaults
-        UserDefaults.standard.set(user.uid, forKey: "userId")
-
-        try await addUserToFirestore(uid: user.uid, email: user.email ?? "guest@example.com")
         
-        // Fetch and store username
+        // Store user ID
+        UserDefaults.standard.set(user.uid, forKey: "userId")
+        
+        // Ensure user is added to Firestore
+        try await addUserToFirestore(uid: user.uid, email: user.email ?? "")
+
+        // Fetch or prompt for username
         await fetchAndStoreUsername(for: user.uid)
+
+        self.isSignedIn = true
     }
     
     private func fetchAndStoreUsername(for userId: String) async {
         do {
             let document = try await db.collection("users").document(userId).getDocument()
-            if let data = document.data(), let fetchedUsername = data["username"] as? String {
-                // Store username in UserDefaults
+            if let data = document.data(), let fetchedUsername = data["username"] as? String, !fetchedUsername.isEmpty {
+                print("Fetched username: \(fetchedUsername)") // Debugging line
                 UserDefaults.standard.set(fetchedUsername, forKey: "username")
+                self.username = fetchedUsername
+                self.shouldPromptForUsername = false
+            } else {
+                print("No username found, prompting user.") // Debugging line
+                self.shouldPromptForUsername = true
             }
         } catch {
             print("Error fetching username: \(error)")
+            self.shouldPromptForUsername = true
         }
     }
     
     private func addUserToFirestore(uid: String, email: String) async throws {
         let userDocument = db.collection("users").document(uid)
 
-        let data: [String: Any] = [
-            "uid": uid,
-            "username": "Guest",  // Changed from "name" to "username" for consistency
-            "currentLobbyId": "",
-            "inLobby": false,
-            "email": email
-        ]
-
         let document = try await userDocument.getDocument()
         if !document.exists {
+            let data: [String: Any] = [
+                "uid": uid,
+                "username": "",
+                "currentLobbyId": "",
+                "inLobby": false,
+                "email": email
+            ]
             try await userDocument.setData(data)
+        }
+    }
+    
+    func updateUsername(for userId: String, username: String) async {
+        do {
+            try await db.collection("users").document(userId).updateData(["username": username])
+            print("Updated username in Firestore: \(username)") // Debugging line
+            UserDefaults.standard.set(username, forKey: "username")
+            self.username = username
+            self.shouldPromptForUsername = false
+        } catch {
+            print("Error updating username: \(error)")
+        }
+    }
+    
+    func checkSignInStatus() {
+        if let user = Auth.auth().currentUser {
+            self.isSignedIn = true
+            self.username = UserDefaults.standard.string(forKey: "username")
+            print("Loaded username from UserDefaults: \(self.username ?? "None")") // Debugging line
+            if username == nil {
+                Task {
+                    await fetchAndStoreUsername(for: user.uid)
+                }
+            }
+        } else {
+            self.isSignedIn = false
+            self.username = nil
+        }
+    }
+
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            self.isSignedIn = false
+            self.username = nil
+            UserDefaults.standard.removeObject(forKey: "username")
+            UserDefaults.standard.removeObject(forKey: "userId")
+        } catch {
+            print("Error signing out: \(error)")
         }
     }
 }
@@ -68,13 +120,11 @@ struct AuthenticationView: View {
     @StateObject private var viewModel = AuthenticationViewModel()
     @Binding var showSignInView: Bool
     
-    @State private var isSignedIn: Bool = false
-    @State private var username: String? = nil
+    @State private var newUsername: String = ""
 
     var body: some View {
         VStack {
-            
-            if isSignedIn, let username = username {
+            if viewModel.isSignedIn, let username = viewModel.username {
                 Text("Currently signed in as \(username)")
                     .font(.headline)
                     .padding()
@@ -113,18 +163,8 @@ struct AuthenticationView: View {
                     do {
                         try await viewModel.signInGoogle()
                         showSignInView = false
-                        self.isSignedIn = true
-                        // Try to get username from UserDefaults
-                        if let username = UserDefaults.standard.string(forKey: "username") {
-                            self.username = username
-                        } else {
-                            // Fetch from Firestore
-                            if let user = Auth.auth().currentUser {
-                                await fetchUsername(for: user.uid)
-                            }
-                        }
                     } catch {
-                        print(error)
+                        print("Error signing in: \(error)")
                     }
                 }
             }
@@ -134,39 +174,32 @@ struct AuthenticationView: View {
         .padding()
         .navigationTitle("Sign In")
         .onAppear {
-            // Check if user is signed in
-            if let user = Auth.auth().currentUser {
-                self.isSignedIn = true
-                // Try to get username from UserDefaults
-                if let storedUsername = UserDefaults.standard.string(forKey: "username") {
-                    self.username = storedUsername
-                } else {
-                    // Fetch from Firestore
-                    Task {
-                        await fetchUsername(for: user.uid)
+            viewModel.checkSignInStatus()
+        }
+        .sheet(isPresented: $viewModel.shouldPromptForUsername) {
+            VStack {
+                Text("Create a Username")
+                    .font(.headline)
+                    .padding()
+
+                TextField("Enter your username", text: $newUsername)
+                    .padding()
+                    .background(Color.gray.opacity(0.4))
+                    .cornerRadius(10)
+
+                Button("Save Username") {
+                    if let userId = UserDefaults.standard.string(forKey: "userId") {
+                        Task {
+                            await viewModel.updateUsername(for: userId, username: newUsername)
+                        }
                     }
                 }
-            } else {
-                self.isSignedIn = false
-                self.username = nil
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
-        }
-    }
-    
-    func fetchUsername(for userId: String) async {
-        let db = Firestore.firestore()
-        do {
-            let document = try await db.collection("users").document(userId).getDocument()
-            if let data = document.data(), let fetchedUsername = data["username"] as? String {
-                self.username = fetchedUsername
-                // Store in UserDefaults
-                UserDefaults.standard.set(fetchedUsername, forKey: "username")
-            } else {
-                self.username = "Unknown"
-            }
-        } catch {
-            print("Error fetching username: \(error)")
-            self.username = "Unknown"
+            .padding()
         }
     }
 }

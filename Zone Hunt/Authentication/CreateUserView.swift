@@ -10,6 +10,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct CreateUserView: View {
+    @State private var uid = ""
     @State private var email = ""
     @State private var username = ""
     @State private var password = ""
@@ -66,9 +67,10 @@ struct CreateUserView: View {
 
     func signUp() {
         guard validateInputs() else { return }
-        
+
         let db = Firestore.firestore()
-        
+
+        // Check if username already exists
         db.collection("users").whereField("username", isEqualTo: username).getDocuments { (snapshot, error) in
             if let error = error {
                 errorMessage = "Error checking username: \(error.localizedDescription)"
@@ -78,25 +80,63 @@ struct CreateUserView: View {
                 errorMessage = "Username already taken"
                 return
             }
-            
+
+            // Sign out any existing user to prevent session conflicts
+            try? Auth.auth().signOut()
+
+            // Create user with Firebase Auth
             Auth.auth().createUser(withEmail: email, password: password) { result, error in
                 if let error = error {
                     errorMessage = "Error creating account: \(error.localizedDescription)"
                     return
                 }
-                
+
                 guard let userId = result?.user.uid else { return }
-                
-                db.collection("users").document(userId).setData([
-                    "email": email,
-                    "username": username
-                ]) { error in
+
+                // Save user info in Firestore
+                let userData: [String: Any] = [
+                    "uid": userId,
+                    "username": username,
+                    "currentLobbyId": "",
+                    "inLobby": false,
+                    "email": email
+                ]
+
+                db.collection("users").document(userId).setData(userData) { error in
                     if let error = error {
                         errorMessage = "Error saving user: \(error.localizedDescription)"
                     } else {
-                        presentationMode.wrappedValue.dismiss()
+                        // Force Firebase to reload the current user
+                        Auth.auth().currentUser?.reload(completion: { reloadError in
+                            if let reloadError = reloadError {
+                                errorMessage = "Error refreshing user session: \(reloadError.localizedDescription)"
+                                return
+                            }
+                            
+                            // Fetch user data to update UI
+                            fetchUserData(userId: userId)
+                        })
                     }
                 }
+            }
+        }
+    }
+
+    // Fetch the user data immediately after sign-up
+    func fetchUserData(userId: String) {
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).getDocument { document, error in
+            if let document = document, document.exists {
+                let data = document.data()
+                self.username = data?["username"] as? String ?? "Unknown"
+                self.uid = data?["uid"] as? String ?? ""
+
+                // Dismiss the view after successful data fetch
+                DispatchQueue.main.async {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            } else {
+                errorMessage = "Error fetching user data: \(error?.localizedDescription ?? "Unknown error")"
             }
         }
     }
