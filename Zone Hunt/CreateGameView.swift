@@ -1,3 +1,4 @@
+//CreateGameView.swift
 import SwiftUI
 import MapKit
 import FirebaseFirestore
@@ -93,11 +94,12 @@ struct CreateGameView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     @State private var isLoading = false
+    
     @State private var radius: Double = 500.0
     @State private var lobbyCreated = false
     @State private var lobbyId: String = ""
     @State private var messageText: String = ""
-    
+    @State private var isEditingSettings = false // Add this line
     @StateObject private var lobbyViewModel = LobbyViewModel()
     
     private let db = Firestore.firestore()

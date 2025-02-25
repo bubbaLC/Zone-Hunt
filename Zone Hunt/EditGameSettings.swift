@@ -1,3 +1,4 @@
+//EditGameSettings.Swift
 import SwiftUI
 import MapKit
 // Rename MapView to GameMapView
