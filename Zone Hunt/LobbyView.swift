@@ -1,9 +1,4 @@
-//
 //  LobbyView.swift
-//  Zone Hunt
-//
-//  Created by Liam Colton on 9/11/24.
-//
 
 import SwiftUI
 import FirebaseFirestore
@@ -113,11 +108,11 @@ struct LobbyView: View {
             }
         }
     }
-    
-    struct LobbyView_Previews: PreviewProvider {
-        static var previews: some View {
-            LobbyView()
-        }
+}
+
+struct LobbyView_Previews: PreviewProvider {
+    static var previews: some View {
+        LobbyView()
     }
 }
 

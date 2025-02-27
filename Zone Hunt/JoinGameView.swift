@@ -1,9 +1,4 @@
-//
 //  JoinGameView.swift
-//  Zone Hunt
-//
-//  Created by Liam Colton on 2/4/25.
-//
 
 import SwiftUI
 import FirebaseFirestore
