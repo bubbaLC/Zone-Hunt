@@ -2,6 +2,7 @@
 
 import SwiftUI
 import FirebaseFirestore
+import FirebaseAuth
 
 struct LobbyView: View {
     @State private var gameCode: String = ""
@@ -14,30 +15,33 @@ struct LobbyView: View {
     
     /// Adds the current user's ID to the lobby's "users" field.
     func joinLobby(lobbyId: String) {
-        let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
+        let userId = Auth.auth().currentUser?.uid ?? ""
         let lobbyRef = Firestore.firestore().collection("lobbies").document(lobbyId)
         
-        // First check if lobby exists
+        // Check if the lobby exists
         lobbyRef.getDocument { snapshot, error in
-            guard snapshot?.exists == true else {
+            guard let document = snapshot, document.exists else {
                 DispatchQueue.main.async {
-                    self.errorMessage = "Lobby not found." // Show error
+                    self.errorMessage = "Lobby not found."
                 }
                 return
             }
             
-            // Add user to lobby
+            // Add the user to the lobby's "users" field if not already in
             lobbyRef.updateData(["users": FieldValue.arrayUnion([userId])]) { error in
                 DispatchQueue.main.async {
-                    if error == nil {
-                        navigateToLobbyDetail = true // Trigger navigation
+                    if let error = error {
+                        self.errorMessage = "Failed to join. Try again. \(error.localizedDescription)"
                     } else {
-                        self.errorMessage = "Failed to join. Try again."
+                        // Ensure the game code is properly passed to JoinGameView
+                        self.gameCode = lobbyId
+                        self.navigateToLobbyDetail = true // Navigate to the lobby
                     }
                 }
             }
         }
     }
+
     
     var body: some View {
         NavigationStack {
@@ -60,7 +64,7 @@ struct LobbyView: View {
                     Spacer()
                     
                     // Create Game Button (navigates to CreateGameView)
-                    NavigationLink(destination: CreateGameView()) {
+                    NavigationLink(destination: CreateGameView(/*lobbyId: gameCode*/)) {
                         Text("Create Game")
                             .font(.title2)
                             .fontWeight(.semibold)
@@ -101,8 +105,11 @@ struct LobbyView: View {
                     Spacer()
                     
                     // Hidden NavigationLink for programmatic navigation to the LobbyDetailView.
-                    .navigationDestination(isPresented: $navigateToLobbyDetail) {
-                        LobbyDetailView(lobbyId: gameCode)
+                    NavigationLink(
+                        destination: JoinGameView(gameCode: Int(gameCode) ?? 0),
+                        isActive: $navigateToLobbyDetail
+                    ) {
+                        EmptyView()
                     }
                 }
             }

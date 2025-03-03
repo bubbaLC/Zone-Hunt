@@ -1,132 +1,207 @@
 //  JoinGameView.swift
 
 import SwiftUI
+import MapKit
 import FirebaseFirestore
 import FirebaseAuth
 
 struct JoinGameView: View {
-    @State private var gameCode: String = ""
+    var gameCode: Int = 0
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
     @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var navigateToLobbyDetail = false // For navigation
-
+    @State private var radius: Double = 500.0
+    @State private var lobbyCreated = false
+    @State private var lobbyId: String = ""
+    @State private var messageText: String = ""
+    @State private var isEditingSettings = false // Add this line
+    @StateObject private var lobbyViewModel = LobbyViewModel()
+    
     private let db = Firestore.firestore()
+    
+    //var lobbyId: String // Use the passed-in lobbyId instead of a @State variable
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                TextField("Enter game code", text: $gameCode)
+        ZStack {
+            Image("BackgroundImage")
+                .resizable()
+                .scaledToFill()
+                .edgesIgnoringSafeArea(.all)
+
+            VStack {
+                Text("Game Code: \(String(gameCode))") // Ensures no commas
+                    .font(.system(size: 34, weight: .heavy))
+                    .foregroundColor(.white)
+                    .padding(.top, 55)
+
+                Spacer()
+
+                Text("Players in Lobby")
+                    .font(.title2)
+                    .foregroundColor(.white)
                     .padding()
-                    .keyboardType(.numberPad)
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(8)
-                
-                if isLoading {
-                    ProgressView()
+
+                List(lobbyViewModel.users, id: \.self) { userId in
+                    if let username = lobbyViewModel.userNames[userId] {
+                        Text(username) // Show the username
+                            .font(.headline)
+                            .foregroundColor(.black)
+                    } else {
+                        Text("Loading...") // Display a placeholder until the username is fetched
+                            .font(.headline)
+                            .foregroundColor(.black)
+                    }
                 }
+                .frame(height: 150)
+                .background(BlurredBackground()) // Custom background modifier
+                .cornerRadius(12)
+                .padding(.horizontal)
                 
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
+                Text("Lobby Chat")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(.top)
+
+                List(lobbyViewModel.messages) { message in
+                    VStack(alignment: .leading) {
+                        Text(message.userId)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Text(message.text)
+                            .font(.body)
+                            .foregroundColor(.black)
+                    }
                 }
+                .frame(height: 200)
+                .background(BlurredBackground()) // Custom background modifier
+                .cornerRadius(12)
+                .padding(.horizontal)
                 
-                Button("Join Game") {
-                    joinGame()
+                HStack {
+                    TextField("Type a message...", text: $messageText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(height: 40)
+                        .padding(.horizontal)
+                        .padding(.vertical, 5)
+
+                    Button(action: sendMessage) {
+                        Image(systemName: "paperplane.fill")
+                            .foregroundColor(.blue)
+                    }
                 }
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                .padding(.horizontal)
+
+                Button(action: startGame) {
+                    Text("Start Game")
+                        .font(.title2)
+                        .fontWeight(.heavy)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .padding(.horizontal, 25)
+                        .padding(.top, 10)
+                        .padding(.bottom, 65)
+                }
+                .disabled(isLoading)
             }
-            .padding()
-            .navigationDestination(isPresented: $navigateToLobbyDetail) {
-                LobbyDetailView(lobbyId: gameCode)
-            }
+            .navigationBarHidden(true)
+        }
+        .onAppear {
+            self.lobbyId = "\(gameCode)" // Ensure lobbyId is set correctly
+            self.lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen to correct lobby
+        }
+        .onDisappear {
+            lobbyViewModel.stopListening()
+            leaveLobby()
+        }
+        .onChange(of: lobbyViewModel.messages) { newMessages in
+            print("Messages Updated: \(newMessages)")
         }
     }
     
-    func joinGame() {
-        guard !gameCode.isEmpty else {
-            errorMessage = "Please enter a valid game code."
+    // MARK: - Helper Methods
+    func sendMessage() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        lobbyViewModel.sendMessage(lobbyId: lobbyId, userId: userId, message: messageText)
+        messageText = "" // Clear text field after sending
+    }
+    // MARK: - Firestore Logic
+    func createLobby() {
+        guard let user = Auth.auth().currentUser else {
+            print("User not authenticated")
             return
         }
         
+        lobbyCreated = true
+        
+        let gameCodeString = "\(gameCode)"
+        self.lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
+        self.lobbyId = gameCodeString
+    }
+
+    func leaveLobby() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        let lobbyRef = Firestore.firestore().collection("lobbies").document(lobbyId)
+
+        Firestore.firestore().runTransaction { transaction, errorPointer in
+            let lobbyDoc: DocumentSnapshot
+            do {
+                lobbyDoc = try transaction.getDocument(lobbyRef)
+            } catch {
+                errorPointer?.pointee = error as NSError
+                return nil
+            }
+
+            guard var users = lobbyDoc.data()?["users"] as? [String] else { return nil }
+            
+            // Remove the user from the lobby
+            users.removeAll { $0 == userId }
+
+            if users.isEmpty {
+                // If no users are left, delete the lobby
+                transaction.deleteDocument(lobbyRef)
+            } else {
+                // Otherwise, update the users list
+                transaction.updateData(["users": users], forDocument: lobbyRef)
+            }
+
+            return nil
+        } completion: { _, error in
+            if let error = error {
+                print("Error leaving lobby: \(error)")
+            } else {
+                print("Successfully left the lobby")
+            }
+        }
+    }
+
+
+    func startGame() {
         isLoading = true
-        errorMessage = nil
-        
-        let lobbyRef = db.collection("lobbies").document(gameCode) // Document ID = game code
-        
-         /* I Dont know if I need this code I replaced it with the code below */
-        
-//        lobbyRef.getDocument { snapshot, error in
-//            guard snapshot?.exists == true else {
-//                errorMessage = "Lobby not found."
-//                isLoading = false
-//                return
-//            }
-//            
-//            guard let snapshot = snapshot, snapshot.exists, let data = snapshot.data() else {
-//                errorMessage = "Lobby not found."
-//                isLoading = false
-//                return
-//            }
-//            
-//            guard let currentUser = Auth.auth().currentUser else {
-//                errorMessage = "You must be logged in to join a game."
-//                isLoading = false
-//                return
-//            }
-//            
-//            let currentUserId = currentUser.uid
-//            var users = data["users"] as? [String] ?? []
-//            
-//            if !users.contains(currentUserId) {
-//                users.append(currentUserId)
-//            }
-//            
-//            lobbyRef.updateData(["users": FieldValue.arrayUnion([currentUserId])]) { error in
-//                DispatchQueue.main.async {
-//                    isLoading = false
-//                    if error == nil {
-//                        navigateToLobbyDetail = true // Trigger navigation
-//                    } else {
-//                        errorMessage = "Join failed. Try again."
-//                    }
-//                }
-//            }
-//        }
-        
-        // 1. Check if lobby exists
-        lobbyRef.getDocument { snapshot, error in
-            guard snapshot?.exists == true else {
-                DispatchQueue.main.async {
-                    isLoading = false
-                    errorMessage = "Lobby not found."
-                }
-                return
-            }
-            
-            guard let currentUser = Auth.auth().currentUser else {
-                DispatchQueue.main.async {
-                    isLoading = false
-                    errorMessage = "You must be logged in to join a game."
-                }
-                return
-            }
-            
-            let userId = currentUser.uid
-            
-            // 2. Add user to lobby
-            lobbyRef.updateData(["users": FieldValue.arrayUnion([userId])]) { error in
-                DispatchQueue.main.async {
-                    isLoading = false
-                    if error == nil {
-                        navigateToLobbyDetail = true // Trigger navigation
-                    } else {
-                        errorMessage = "Join failed. Try again."
-                    }
+        db.collection("lobbies").document(lobbyId).updateData([
+            "gameState": "active"
+        ]) { error in
+            DispatchQueue.main.async {
+                self.isLoading = false
+                if let error = error {
+                    print("Error starting game: \(error.localizedDescription)")
+                } else {
+                    print("Game started!")
                 }
             }
         }
     }
 }
+
+
+struct JoinGameView_Previews: PreviewProvider {
+    static var previews: some View {
+        //CreateGameView(lobbyId: "123456")
+        JoinGameView()
+    }
+}
+

@@ -94,7 +94,6 @@ struct CreateGameView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     @State private var isLoading = false
-    
     @State private var radius: Double = 500.0
     @State private var lobbyCreated = false
     @State private var lobbyId: String = ""
@@ -103,6 +102,8 @@ struct CreateGameView: View {
     @StateObject private var lobbyViewModel = LobbyViewModel()
     
     private let db = Firestore.firestore()
+    
+    //var lobbyId: String // Use the passed-in lobbyId instead of a @State variable
 
     var body: some View {
         ZStack {
@@ -136,7 +137,6 @@ struct CreateGameView: View {
                     }
                 }
                 .frame(height: 150)
-                .frame(height: 150)
                 .background(BlurredBackground()) // Custom background modifier
                 .cornerRadius(12)
                 .padding(.horizontal)
@@ -160,6 +160,7 @@ struct CreateGameView: View {
                 .background(BlurredBackground()) // Custom background modifier
                 .cornerRadius(12)
                 .padding(.horizontal)
+                
                 HStack {
                     TextField("Type a message...", text: $messageText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -207,7 +208,7 @@ struct CreateGameView: View {
             if !lobbyCreated {
                 createLobby()
             } else {
-                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId)
+                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen for updates from the correct lobby
             }
         }
         .onDisappear {
@@ -363,6 +364,7 @@ struct BlurredBackground: View {
 
 struct CreateGameView_Previews: PreviewProvider {
     static var previews: some View {
+        //CreateGameView(lobbyId: "123456")
         CreateGameView()
     }
 }
