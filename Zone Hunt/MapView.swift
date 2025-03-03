@@ -8,16 +8,17 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+
 struct MapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     @Binding var radius: Double
     @Binding var userLocation: CLLocationCoordinate2D? // Binding for user's coordinates
     let locationManager = CLLocationManager()
-    // Track if the map has already been centered on the user's location
-    @State private var isInitialRegionSet: Bool = false
+    
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
-        mapView.showsUserLocation = true
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+        mapView.showsUserLocation = true  // Default blue dot for user's location
         mapView.isZoomEnabled = true
         mapView.isScrollEnabled = true
         mapView.delegate = context.coordinator
@@ -25,47 +26,75 @@ struct MapView: UIViewRepresentable {
         locationManager.delegate = context.coordinator
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
+        
         return mapView
     }
+    
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        if !isInitialRegionSet {
-            // Center the map on the user's location initially
-            uiView.setRegion(region, animated: true)
-            isInitialRegionSet = true
+        uiView.setRegion(region, animated: true)
+        // If user location is updated, update the red dot on the map
+        if let userLocation = userLocation {
+            let coordinate = userLocation
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            uiView.addAnnotation(annotation)
         }
     }
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
+    
     class Coordinator: NSObject, MKMapViewDelegate, CLLocationManagerDelegate {
         var parent: MapView
+        
         init(_ parent: MapView) {
             self.parent = parent
         }
-        // Update the region based on the user's location, but only once at the start
+        
         func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            if let location = locations.first, !parent.isInitialRegionSet {
-                // Center on user's location initially
-                parent.region = MKCoordinateRegion(
-                    center: location.coordinate,
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                )
+            if let location = locations.first {
+                DispatchQueue.main.async {
+                    self.parent.userLocation = location.coordinate
+                    self.parent.region = MKCoordinateRegion(
+                        center: location.coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                    )
+                }
             }
         }
+        
         func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
             if status == .authorizedWhenInUse || status == .authorizedAlways {
                 manager.startUpdatingLocation()
             }
         }
-        // Customize the appearance of the user's location (the blinking dot)
-        func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-            if let annotationView = mapView.view(for: userLocation) {
-                annotationView.image = UIImage(systemName: "circle.fill")
-                annotationView.tintColor = UIColor.red
-                annotationView.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-                addBlinkingAnimation(to: annotationView)
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            // Skip the default user location annotation
+            if annotation is MKUserLocation {
+                return nil
             }
+            
+            let identifier = "UserLocationMarker"
+            var view: MKAnnotationView
+            
+            if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) {
+                view = dequeuedView
+            } else {
+                view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.canShowCallout = false
+            }
+            
+            // Set custom red dot for user location
+            view.image = UIImage(systemName: "circle.fill")
+            view.tintColor = .red
+            view.frame.size = CGSize(width: 30, height: 30)
+            addBlinkingAnimation(to: view)
+            
+            return view
         }
+        
         func addBlinkingAnimation(to view: MKAnnotationView) {
             let blinkAnimation = CABasicAnimation(keyPath: "opacity")
             blinkAnimation.fromValue = 1.0
@@ -78,5 +107,3 @@ struct MapView: UIViewRepresentable {
         }
     }
 }
-
-

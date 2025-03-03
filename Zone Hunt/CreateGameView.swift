@@ -88,6 +88,7 @@ class LobbyViewModel: ObservableObject {
 }
 
 struct CreateGameView: View {
+    @State private var isGameStarted = false
     @State private var gameCode: Int = 0
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
@@ -99,6 +100,7 @@ struct CreateGameView: View {
     @State private var lobbyId: String = ""
     @State private var messageText: String = ""
     @State private var isEditingSettings = false // Add this line
+    @State private var userLocation: CLLocationCoordinate2D?
     @StateObject private var lobbyViewModel = LobbyViewModel()
     
     private let db = Firestore.firestore()
@@ -194,14 +196,26 @@ struct CreateGameView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .background(isLoading ? Color.gray : Color.blue)
                         .cornerRadius(10)
                         .padding(.horizontal, 25)
                         .padding(.top, 10)
                         .padding(.bottom, 65)
                 }
                 .disabled(isLoading)
-            }
+
+                // Navigation to MapView
+                NavigationLink(
+                    destination: ZStack {
+                        MapView(region: $region, radius: $radius, userLocation: $userLocation)
+                            .edgesIgnoringSafeArea(.all) // Ensures map fills the screen
+                            .navigationBarHidden(true) // Hide the navigation bar
+                    },
+                    isActive: $isGameStarted
+                ) {
+                    EmptyView() // Invisible link
+                }
+                .disabled(isLoading)            }
             .navigationBarHidden(true)
         }
         .onAppear {
