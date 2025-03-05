@@ -177,7 +177,9 @@ struct CreateGameView: View {
                 }
                 .padding(.horizontal)
                 
-                NavigationLink(destination: EditGameSettings(gameView: self)) {
+                NavigationLink(destination: EditGameSettings(gameView: self)
+                                 .onAppear { isEditingSettings = true }
+                                 .onDisappear { isEditingSettings = false }) {
                     Text("Edit Game Settings")
                         .font(.title2)
                         .fontWeight(.heavy)
@@ -188,6 +190,7 @@ struct CreateGameView: View {
                         .cornerRadius(10)
                         .padding(.horizontal, 25)
                 }
+
 
                 Button(action: startGame) {
                     Text("Start Game")
@@ -226,8 +229,10 @@ struct CreateGameView: View {
             }
         }
         .onDisappear {
-            lobbyViewModel.stopListening()
-            leaveLobby()
+            if !isEditingSettings && !isGameStarted {
+                lobbyViewModel.stopListening()
+                leaveLobby()
+            }
         }
         .onChange(of: lobbyViewModel.messages) { newMessages in
             print("Messages Updated: \(newMessages)")
@@ -344,6 +349,7 @@ struct CreateGameView: View {
 
 
     func startGame() {
+        isGameStarted = true
         isLoading = true
         db.collection("lobbies").document(lobbyId).updateData([
             "gameState": "active"
