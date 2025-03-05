@@ -1,9 +1,4 @@
-//
 //  MapView.swift
-//  Zone Hunt
-//
-//  Created by Liam Colton on 9/10/24.
-//
 
 import SwiftUI
 import MapKit
@@ -14,7 +9,8 @@ struct MapView: UIViewRepresentable {
     @Binding var radius: Double
     @Binding var userLocation: CLLocationCoordinate2D? // Binding for user's coordinates
     let locationManager = CLLocationManager()
-    
+    var onExit: () -> Void // Callback for leaving the lobby
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.translatesAutoresizingMaskIntoConstraints = false
