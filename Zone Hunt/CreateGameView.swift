@@ -209,15 +209,19 @@ struct CreateGameView: View {
 
                 // Navigation to MapView
                 NavigationLink(
-                    destination: ZStack {
-                        MapView(region: $region, radius: $radius, userLocation: $userLocation)
-                            .edgesIgnoringSafeArea(.all) // Ensures map fills the screen
-                            .navigationBarHidden(true) // Hide the navigation bar
-                    },
+                    destination: MapView(region: $region, radius: $radius, userLocation: $userLocation, onExit: leaveLobby)
+                        .edgesIgnoringSafeArea(.all)
+                        .navigationBarHidden(true)
+                        .onDisappear {
+                            // This will be called when the MapView is popped off the navigation stack.
+                            leaveLobby()
+                            isGameStarted = false
+                        },
                     isActive: $isGameStarted
                 ) {
-                    EmptyView() // Invisible link
+                    EmptyView()
                 }
+
                 .disabled(isLoading)            }
             .navigationBarHidden(true)
         }
