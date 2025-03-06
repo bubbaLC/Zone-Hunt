@@ -16,7 +16,9 @@ struct JoinGameView: View {
     @State private var lobbyCreated = false
     @State private var lobbyId: String = ""
     @State private var messageText: String = ""
-    @State private var isEditingSettings = false // Add this line
+    @State private var isEditingSettings = false
+    @State private var isGameStarted = false           // Added to trigger navigation
+    @State private var userLocation: CLLocationCoordinate2D? = nil // Added binding for MapView
     @StateObject private var lobbyViewModel = LobbyViewModel()
     
     private let db = Firestore.firestore()
@@ -109,10 +111,29 @@ struct JoinGameView: View {
                 .disabled(isLoading)
             }
             .navigationBarHidden(true)
+            
+            // Hidden NavigationLink to MapView
+            NavigationLink(
+                destination: MapView(region: $region, radius: $radius, userLocation: $userLocation, onExit: leaveLobby)
+                    .edgesIgnoringSafeArea(.all)
+                    .navigationBarHidden(true)
+                    .onDisappear {
+                        lobbyViewModel.stopListening()
+                        leaveLobby()
+                    },
+                isActive: $isGameStarted
+            ) {
+                EmptyView()
+            }
         }
         .onAppear {
             self.lobbyId = "\(gameCode)" // Ensure lobbyId is set correctly
             self.lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen to correct lobby
+        }
+        .onChange(of: lobbyViewModel.gameState) { newState in
+            if newState == "active" && !isGameStarted {
+                isGameStarted = true
+            }
         }
         .onDisappear {
             lobbyViewModel.stopListening()
