@@ -8,6 +8,7 @@ class LobbyViewModel: ObservableObject {
     @Published var users: [String] = []
     @Published var messages: [Message] = []
     @Published var userNames: [String: String] = [:] // Store usernames here
+    @Published var gameState: String = "waiting" // New property for game state
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
 
@@ -18,6 +19,12 @@ class LobbyViewModel: ObservableObject {
             guard let data = document?.data(), error == nil else {
                 print("Error fetching lobby: \(error?.localizedDescription ?? "Unknown error")")
                 return
+            }
+            
+            if let state = data["gameState"] as? String {
+                DispatchQueue.main.async {
+                    self.gameState = state  // Update the game state
+                }
             }
 
             if let usersArray = data["users"] as? [String] {
@@ -230,6 +237,11 @@ struct CreateGameView: View {
                 createLobby()
             } else {
                 lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen for updates from the correct lobby
+            }
+        }
+        .onChange(of: lobbyViewModel.gameState) { newState in
+            if newState == "active" && !isGameStarted {
+                isGameStarted = true
             }
         }
         .onDisappear {
