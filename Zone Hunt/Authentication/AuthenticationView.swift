@@ -20,6 +20,8 @@ final class AuthenticationViewModel: ObservableObject {
     @Published var username: String? = nil
     @Published var isSignedIn: Bool = false
     
+    @ObservedObject private var locationManager = LocationManager() // Track location
+
     func signInGoogle() async throws {
         let helper = SignInGoogleHelper()
         let tokens = try await helper.signIn()
@@ -31,6 +33,9 @@ final class AuthenticationViewModel: ObservableObject {
         // Store user ID
         UserDefaults.standard.set(user.uid, forKey: "userId")
         
+//        // Request location permission so the user sees the prompt
+//        locationManager.requestPermission()
+
         // Ensure user is added to Firestore
         try await addUserToFirestore(uid: user.uid, email: user.email ?? "")
 
@@ -60,7 +65,9 @@ final class AuthenticationViewModel: ObservableObject {
     
     private func addUserToFirestore(uid: String, email: String) async throws {
         let userDocument = db.collection("users").document(uid)
-
+        // Get user location
+        let userLatitude = locationManager.location?.latitude ?? 0.0
+        let userLongitude = locationManager.location?.longitude ?? 0.0
         let document = try await userDocument.getDocument()
         if !document.exists {
             let data: [String: Any] = [
@@ -68,7 +75,9 @@ final class AuthenticationViewModel: ObservableObject {
                 "username": "",
                 "currentLobbyId": "",
                 "inLobby": false,
-                "email": email
+                "email": email,
+                "latitude": userLatitude,
+                "longitude": userLongitude
             ]
             try await userDocument.setData(data)
         }
@@ -116,10 +125,7 @@ final class AuthenticationViewModel: ObservableObject {
 }
 
 struct AuthenticationView: View {
-    
-    @StateObject private var viewModel = AuthenticationViewModel()
-    @Binding var showSignInView: Bool
-    
+    @EnvironmentObject var viewModel: AuthenticationViewModel
     @State private var newUsername: String = ""
 
     var body: some View {
@@ -162,7 +168,8 @@ struct AuthenticationView: View {
                 Task {
                     do {
                         try await viewModel.signInGoogle()
-                        showSignInView = false
+                        // When signInGoogle() sets isSignedIn to true,
+                        // RootView will automatically switch to ContentView.
                     } catch {
                         print("Error signing in: \(error)")
                     }
@@ -207,7 +214,8 @@ struct AuthenticationView: View {
 struct AuthenticationView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            AuthenticationView(showSignInView: .constant(true))
+            AuthenticationView()
+                .environmentObject(AuthenticationViewModel())
         }
     }
 }

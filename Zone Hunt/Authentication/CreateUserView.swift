@@ -16,6 +16,7 @@ struct CreateUserView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var errorMessage = ""
+    @StateObject private var locationManager = LocationManager()
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -93,35 +94,42 @@ struct CreateUserView: View {
 
                 guard let userId = result?.user.uid else { return }
 
-                // Save user info in Firestore
-                let userData: [String: Any] = [
-                    "uid": userId,
-                    "username": username,
-                    "currentLobbyId": "",
-                    "inLobby": false,
-                    "email": email
-                ]
+                // Request location permission and get user's location
+                locationManager.requestPermission()
+                locationManager.requestLocation { location in
+                    let latitude = location?.latitude ?? 37.779026 // Default to SF City Hall for testing
+                    let longitude = location?.longitude ?? -122.419906
 
-                db.collection("users").document(userId).setData(userData) { error in
-                    if let error = error {
-                        errorMessage = "Error saving user: \(error.localizedDescription)"
-                    } else {
-                        // Force Firebase to reload the current user
-                        Auth.auth().currentUser?.reload(completion: { reloadError in
-                            if let reloadError = reloadError {
-                                errorMessage = "Error refreshing user session: \(reloadError.localizedDescription)"
-                                return
+                    // Save user info in Firestore
+                    let userData: [String: Any] = [
+                        "uid": userId,
+                        "username": username,
+                        "currentLobbyId": "",
+                        "inLobby": false,
+                        "email": email,
+                        "latitude": latitude,
+                        "longitude": longitude
+                    ]
+
+                    db.collection("users").document(userId).setData(userData) { error in
+                        if let error = error {
+                            errorMessage = "Error saving user: \(error.localizedDescription)"
+                        } else {
+                            // Start continuous location updates
+                            locationManager.startUpdatingLocation()
+                            Auth.auth().currentUser?.reload { reloadError in
+                                if let reloadError = reloadError {
+                                    errorMessage = "Error refreshing user session: \(reloadError.localizedDescription)"
+                                    return
+                                }
+                                fetchUserData(userId: userId)
                             }
-                            
-                            // Fetch user data to update UI
-                            fetchUserData(userId: userId)
-                        })
+                        }
                     }
                 }
             }
         }
     }
-
     // Fetch the user data immediately after sign-up
     func fetchUserData(userId: String) {
         let db = Firestore.firestore()

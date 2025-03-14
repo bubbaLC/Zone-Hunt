@@ -213,7 +213,7 @@ struct CreateGameView: View {
                         .padding(.bottom, 65)
                 }
                 .disabled(isLoading)
-
+                
                 // Navigation to MapView
                 NavigationLink(
                     destination: MapView(region: $region, radius: $radius, userLocation: $userLocation, onExit: leaveLobby)

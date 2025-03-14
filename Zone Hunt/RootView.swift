@@ -8,11 +8,20 @@
 import SwiftUI
 
 struct RootView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+    @EnvironmentObject var authVM: AuthenticationViewModel
 
-#Preview {
-    RootView()
+    var body: some View {
+        Group {
+            if authVM.isSignedIn {
+                ContentView() // Your main app view
+            } else {
+                NavigationStack {
+                    AuthenticationView() // No need for an extra binding here
+                }
+            }
+        }
+        .onAppear {
+            authVM.checkSignInStatus()
+        }
+    }
 }

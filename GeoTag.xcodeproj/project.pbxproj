@@ -37,6 +37,8 @@
 		C406275D2C9DC5D90016DFD0 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C406275C2C9DC5D90016DFD0 /* AuthenticationManager.swift */; };
 		C406275F2C9DC5FE0016DFD0 /* SignInEmailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C406275E2C9DC5FE0016DFD0 /* SignInEmailView.swift */; };
 		C41373AF2C99CC80009CF569 /* CreateGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41373AE2C99CC80009CF569 /* CreateGameView.swift */; };
+		C4205E352D7F3A6100AE3455 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4205E342D7F3A6100AE3455 /* LocationManager.swift */; };
+		C4205E372D847B1300AE3455 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4205E362D847B1300AE3455 /* RootView.swift */; };
 		C421B6052CA6FE250092CD51 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C421B6042CA6FE250092CD51 /* GoogleSignIn */; };
 		C421B6072CA6FE250092CD51 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C421B6062CA6FE250092CD51 /* GoogleSignInSwift */; };
 		C421B60E2CAC43A40092CD51 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = C421B60D2CAC43A40092CD51 /* Utilities.swift */; };
@@ -84,11 +86,12 @@
 		C406275C2C9DC5D90016DFD0 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		C406275E2C9DC5FE0016DFD0 /* SignInEmailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInEmailView.swift; sourceTree = "<group>"; };
 		C41373AE2C99CC80009CF569 /* CreateGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGameView.swift; sourceTree = "<group>"; };
+		C4205E342D7F3A6100AE3455 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		C4205E362D847B1300AE3455 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		C421B60D2CAC43A40092CD51 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		C421B6112CAC47070092CD51 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C421B6132CB429A10092CD51 /* EditGameSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGameSettings.swift; sourceTree = "<group>"; };
 		C45F59E42C91E8F4002C7CA4 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
-		C4722BD72D4001BF00B205B5 /* Zone-Hunt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Zone-Hunt-Info.plist"; sourceTree = SOURCE_ROOT; };
 		C4722BD82D52733A00B205B5 /* JoinGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGameView.swift; sourceTree = "<group>"; };
 		C4722BDA2D52737900B205B5 /* LobbyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyDetailView.swift; sourceTree = "<group>"; };
 		C4722BDC2D52744C00B205B5 /* LobbyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyData.swift; sourceTree = "<group>"; };
@@ -208,7 +211,6 @@
 		C484C6242C909888001AEC91 /* Zone Hunt */ = {
 			isa = PBXGroup;
 			children = (
-				C4722BD72D4001BF00B205B5 /* Zone-Hunt-Info.plist */,
 				2FEDC9562CF0E6B70051EFC4 /* Zone-Hunt-Info.plist */,
 				C484C6252C909888001AEC91 /* Zone_HuntApp.swift */,
 				C484C6272C909888001AEC91 /* ContentView.swift */,
@@ -219,6 +221,8 @@
 				C41373AE2C99CC80009CF569 /* CreateGameView.swift */,
 				C421B6132CB429A10092CD51 /* EditGameSettings.swift */,
 				C484C6532C9099B6001AEC91 /* MapView.swift */,
+				C4205E342D7F3A6100AE3455 /* LocationManager.swift */,
+				C4205E362D847B1300AE3455 /* RootView.swift */,
 				C421B60C2CAC43800092CD51 /* Utilities */,
 				C421B60B2CAAF27E0092CD51 /* Authentication */,
 				C484C6292C90988A001AEC91 /* Assets.xcassets */,
@@ -419,6 +423,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C41373AF2C99CC80009CF569 /* CreateGameView.swift in Sources */,
+				C4205E352D7F3A6100AE3455 /* LocationManager.swift in Sources */,
 				C484C6502C909954001AEC91 /* SettingsView.swift in Sources */,
 				C421B60E2CAC43A40092CD51 /* Utilities.swift in Sources */,
 				C406275D2C9DC5D90016DFD0 /* AuthenticationManager.swift in Sources */,
@@ -431,6 +436,7 @@
 				C484C6262C909888001AEC91 /* Zone_HuntApp.swift in Sources */,
 				C406275B2C9DC5B70016DFD0 /* AuthenticationView.swift in Sources */,
 				C45F59E52C91E8F4002C7CA4 /* LobbyView.swift in Sources */,
+				C4205E372D847B1300AE3455 /* RootView.swift in Sources */,
 				C4722BDB2D52737900B205B5 /* LobbyDetailView.swift in Sources */,
 				C4722BDD2D52744C00B205B5 /* LobbyData.swift in Sources */,
 				C406275F2C9DC5FE0016DFD0 /* SignInEmailView.swift in Sources */,
@@ -601,6 +607,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Zone-Hunt-Info.plist";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We nee your location to show your position on the map";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -631,6 +638,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Zone-Hunt-Info.plist";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We nee your location to show your position on the map";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

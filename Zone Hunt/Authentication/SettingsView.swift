@@ -83,7 +83,7 @@ struct SettingsView: View {
                 .font(.subheadline)
                 .padding(.top, 10)
             // Account Settings Button
-            NavigationLink(destination: AuthenticationView(showSignInView: $showSignInView)) {
+            NavigationLink(destination: AuthenticationView(/*showSignInView: $showSignInView*/)) {
                 Text("Account Settings")
                     .font(.headline)
                     .padding()

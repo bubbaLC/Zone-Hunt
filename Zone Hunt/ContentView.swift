@@ -7,8 +7,11 @@
 
 import SwiftUI
 import MapKit
+
 struct ContentView: View {
-    @State private var showSignInView = false  // Add the State variable
+    @State private var showSignInView = false  // Still needed if your SettingsView uses it
+    @EnvironmentObject var authVM: AuthenticationViewModel  // Shared instance for authentication state
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -17,14 +20,17 @@ struct ContentView: View {
                     .resizable()
                     .scaledToFill()
                     .edgesIgnoringSafeArea(.all)
+                
                 VStack {
                     Spacer()
+                    
                     Text("GeoTag")
-                        //.font(.largeTitle)
                         .font(.system(size: 60, weight: .heavy, design: .monospaced))
                         .foregroundColor(.white)
                         .padding()
+                    
                     Spacer()
+                    
                     // Play button leads to the lobby view
                     NavigationLink(destination: LobbyView()) {
                         Text("Play")
@@ -36,27 +42,48 @@ struct ContentView: View {
                             .cornerRadius(10)
                     }
                     .padding(.horizontal)
-                    // Settings button with showSignInView binding
-                    NavigationLink(destination: SettingsView(showSignInView: $showSignInView)) {  // Pass the binding
-                        Text("Settings")
-                            .font(.system(size: 25, weight: .heavy, design: .monospaced))
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.black.opacity(0.7))
-                            .cornerRadius(10)
-                    }
-                    .padding(.horizontal)
+                    
+                    // (Optional) Remove this bottom settings button if you want only the top-right one.
+                    // NavigationLink(destination: SettingsView(showSignInView: $showSignInView)) {
+                    //     Text("Settings")
+                    //         .font(.system(size: 25, weight: .heavy, design: .monospaced))
+                    //         .foregroundColor(.white)
+                    //         .padding()
+                    //         .frame(maxWidth: .infinity)
+                    //         .background(Color.black.opacity(0.7))
+                    //         .cornerRadius(10)
+                    // }
+                    // .padding(.horizontal)
+                    
                     Spacer()
                 }
                 .padding()
             }
-            .navigationBarHidden(true)
+            // Remove .navigationBarHidden(true) so the toolbar shows
+            .navigationBarItems(trailing:
+                NavigationLink(destination: SettingsView(showSignInView: $showSignInView)) {
+                    HStack(spacing: 8) {
+                        if let username = authVM.username {
+                            Text(username)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                        }
+                        Image(systemName: "person.crop.circle")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.white)
+                    }
+                }
+            )
         }
     }
 }
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        NavigationView {
+            ContentView()
+                .environmentObject(AuthenticationViewModel())
+        }
     }
 }

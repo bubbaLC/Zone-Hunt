@@ -1,5 +1,3 @@
-//  MapView.swift
-
 import SwiftUI
 import MapKit
 import CoreLocation
@@ -10,11 +8,12 @@ struct MapView: UIViewRepresentable {
     @Binding var userLocation: CLLocationCoordinate2D? // Binding for user's coordinates
     let locationManager = CLLocationManager()
     var onExit: () -> Void // Callback for leaving the lobby
+    let mapView = MKMapView() // Keep reference to the mapView
+    let userAnnotation = MKPointAnnotation() // Store annotation reference
 
     func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
         mapView.translatesAutoresizingMaskIntoConstraints = false
-        mapView.showsUserLocation = true  // Default blue dot for user's location
+        mapView.showsUserLocation = false  // Hide default blue dot since we add a custom one
         mapView.isZoomEnabled = true
         mapView.isScrollEnabled = true
         mapView.delegate = context.coordinator
@@ -22,18 +21,19 @@ struct MapView: UIViewRepresentable {
         locationManager.delegate = context.coordinator
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
-        
+
         return mapView
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
         uiView.setRegion(region, animated: true)
-        // If user location is updated, update the red dot on the map
+        
+        // Update user's annotation dynamically
         if let userLocation = userLocation {
-            let coordinate = userLocation
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = coordinate
-            uiView.addAnnotation(annotation)
+            userAnnotation.coordinate = userLocation
+            if !uiView.annotations.contains(where: { $0 === userAnnotation }) {
+                uiView.addAnnotation(userAnnotation) // Add only if not already present
+            }
         }
     }
     
@@ -54,7 +54,7 @@ struct MapView: UIViewRepresentable {
                     self.parent.userLocation = location.coordinate
                     self.parent.region = MKCoordinateRegion(
                         center: location.coordinate,
-                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
                     )
                 }
             }
@@ -73,20 +73,18 @@ struct MapView: UIViewRepresentable {
             }
             
             let identifier = "UserLocationMarker"
-            var view: MKAnnotationView
+            var view: MKAnnotationView? = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
             
-            if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) {
-                view = dequeuedView
-            } else {
+            if view == nil {
                 view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view.canShowCallout = false
+                view?.canShowCallout = false
+                view?.image = UIImage(systemName: "circle.fill")
+                view?.tintColor = .red
+                view?.frame.size = CGSize(width: 30, height: 30)
+                addBlinkingAnimation(to: view!)
+            } else {
+                view?.annotation = annotation
             }
-            
-            // Set custom red dot for user location
-            view.image = UIImage(systemName: "circle.fill")
-            view.tintColor = .red
-            view.frame.size = CGSize(width: 30, height: 30)
-            addBlinkingAnimation(to: view)
             
             return view
         }
@@ -94,9 +92,8 @@ struct MapView: UIViewRepresentable {
         func addBlinkingAnimation(to view: MKAnnotationView) {
             let blinkAnimation = CABasicAnimation(keyPath: "opacity")
             blinkAnimation.fromValue = 1.0
-            blinkAnimation.toValue = 0.0
-            blinkAnimation.duration = 0.5
-            blinkAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            blinkAnimation.toValue = 0.3
+            blinkAnimation.duration = 0.8
             blinkAnimation.autoreverses = true
             blinkAnimation.repeatCount = .infinity
             view.layer.add(blinkAnimation, forKey: "blink")
