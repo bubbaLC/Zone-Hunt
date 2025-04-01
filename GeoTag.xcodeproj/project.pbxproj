@@ -95,14 +95,14 @@
 		C4722BD82D52733A00B205B5 /* JoinGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGameView.swift; sourceTree = "<group>"; };
 		C4722BDA2D52737900B205B5 /* LobbyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyDetailView.swift; sourceTree = "<group>"; };
 		C4722BDC2D52744C00B205B5 /* LobbyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyData.swift; sourceTree = "<group>"; };
-		C484C6222C909888001AEC91 /* Zone Hunt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zone Hunt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C6222C909888001AEC91 /* GeoTag.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeoTag.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C484C6252C909888001AEC91 /* Zone_HuntApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntApp.swift; sourceTree = "<group>"; };
 		C484C6272C909888001AEC91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C484C6292C90988A001AEC91 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C484C62C2C90988A001AEC91 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zone HuntTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C6322C90988A001AEC91 /* GeoTagTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoTagTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C484C6362C90988A001AEC91 /* Zone_HuntTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntTests.swift; sourceTree = "<group>"; };
-		C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zone HuntUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C484C63C2C90988A001AEC91 /* GeoTagUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoTagUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C484C6402C90988A001AEC91 /* Zone_HuntUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITests.swift; sourceTree = "<group>"; };
 		C484C6422C90988A001AEC91 /* Zone_HuntUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_HuntUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		C484C64F2C909954001AEC91 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -201,9 +201,9 @@
 		C484C6232C909888001AEC91 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C484C6222C909888001AEC91 /* Zone Hunt.app */,
-				C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */,
-				C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */,
+				C484C6222C909888001AEC91 /* GeoTag.app */,
+				C484C6322C90988A001AEC91 /* GeoTagTests.xctest */,
+				C484C63C2C90988A001AEC91 /* GeoTagUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -260,9 +260,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C484C6212C909888001AEC91 /* Zone Hunt */ = {
+		C484C6212C909888001AEC91 /* GeoTag */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone Hunt" */;
+			buildConfigurationList = C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTag" */;
 			buildPhases = (
 				C484C61E2C909888001AEC91 /* Sources */,
 				C484C61F2C909888001AEC91 /* Frameworks */,
@@ -272,7 +272,7 @@
 			);
 			dependencies = (
 			);
-			name = "Zone Hunt";
+			name = GeoTag;
 			packageProductDependencies = (
 				C406272C2C9C7A8B0016DFD0 /* FirebaseAnalytics */,
 				C406272E2C9C7A8B0016DFD0 /* FirebaseAnalyticsOnDeviceConversion */,
@@ -301,12 +301,12 @@
 				C421B6062CA6FE250092CD51 /* GoogleSignInSwift */,
 			);
 			productName = "Zone Hunt";
-			productReference = C484C6222C909888001AEC91 /* Zone Hunt.app */;
+			productReference = C484C6222C909888001AEC91 /* GeoTag.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C484C6312C90988A001AEC91 /* Zone HuntTests */ = {
+		C484C6312C90988A001AEC91 /* GeoTagTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntTests" */;
+			buildConfigurationList = C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTagTests" */;
 			buildPhases = (
 				C484C62E2C90988A001AEC91 /* Sources */,
 				C484C62F2C90988A001AEC91 /* Frameworks */,
@@ -317,14 +317,14 @@
 			dependencies = (
 				C484C6342C90988A001AEC91 /* PBXTargetDependency */,
 			);
-			name = "Zone HuntTests";
+			name = GeoTagTests;
 			productName = "Zone HuntTests";
-			productReference = C484C6322C90988A001AEC91 /* Zone HuntTests.xctest */;
+			productReference = C484C6322C90988A001AEC91 /* GeoTagTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		C484C63B2C90988A001AEC91 /* Zone HuntUITests */ = {
+		C484C63B2C90988A001AEC91 /* GeoTagUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntUITests" */;
+			buildConfigurationList = C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTagUITests" */;
 			buildPhases = (
 				C484C6382C90988A001AEC91 /* Sources */,
 				C484C6392C90988A001AEC91 /* Frameworks */,
@@ -335,9 +335,9 @@
 			dependencies = (
 				C484C63E2C90988A001AEC91 /* PBXTargetDependency */,
 			);
-			name = "Zone HuntUITests";
+			name = GeoTagUITests;
 			productName = "Zone HuntUITests";
-			productReference = C484C63C2C90988A001AEC91 /* Zone HuntUITests.xctest */;
+			productReference = C484C63C2C90988A001AEC91 /* GeoTagUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -380,9 +380,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C484C6212C909888001AEC91 /* Zone Hunt */,
-				C484C6312C90988A001AEC91 /* Zone HuntTests */,
-				C484C63B2C90988A001AEC91 /* Zone HuntUITests */,
+				C484C6212C909888001AEC91 /* GeoTag */,
+				C484C6312C90988A001AEC91 /* GeoTagTests */,
+				C484C63B2C90988A001AEC91 /* GeoTagUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -465,12 +465,12 @@
 /* Begin PBXTargetDependency section */
 		C484C6342C90988A001AEC91 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C484C6212C909888001AEC91 /* Zone Hunt */;
+			target = C484C6212C909888001AEC91 /* GeoTag */;
 			targetProxy = C484C6332C90988A001AEC91 /* PBXContainerItemProxy */;
 		};
 		C484C63E2C90988A001AEC91 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C484C6212C909888001AEC91 /* Zone Hunt */;
+			target = C484C6212C909888001AEC91 /* GeoTag */;
 			targetProxy = C484C63D2C90988A001AEC91 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -741,7 +741,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone Hunt" */ = {
+		C484C6462C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C484C6472C90988A001AEC91 /* Debug */,
@@ -750,7 +750,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntTests" */ = {
+		C484C6492C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTagTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C484C64A2C90988A001AEC91 /* Debug */,
@@ -759,7 +759,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "Zone HuntUITests" */ = {
+		C484C64C2C90988A001AEC91 /* Build configuration list for PBXNativeTarget "GeoTagUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C484C64D2C90988A001AEC91 /* Debug */,
