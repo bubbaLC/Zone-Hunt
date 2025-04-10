@@ -109,6 +109,7 @@ struct CreateGameView: View {
     @State private var isEditingSettings = false // Add this line
     @State private var userLocation: CLLocationCoordinate2D?
     @StateObject private var lobbyViewModel = LobbyViewModel()
+    @StateObject private var playersLocationViewModel = PlayersLocationViewModel()
     
     private let db = Firestore.firestore()
     
@@ -215,19 +216,26 @@ struct CreateGameView: View {
                 .disabled(isLoading)
                 
                 // Navigation to MapView
+                // In CreateGameView.swift inside the NavigationLink destination:
                 NavigationLink(
-                    destination: MapView(region: $region, radius: $radius, userLocation: $userLocation, onExit: leaveLobby)
-                        .edgesIgnoringSafeArea(.all)
-                        .navigationBarHidden(true)
-                        .onDisappear {
-                            // This will be called when the MapView is popped off the navigation stack.
-                            leaveLobby()
-                            isGameStarted = false
-                        },
+                    destination: MapView(
+                        region: $region,
+                        radius: $radius,
+                        userLocation: $userLocation,
+                        playersLocations: playersLocationViewModel.playersLocations,
+                        onExit: leaveLobby
+                    )
+                    .edgesIgnoringSafeArea(.all)
+                    .navigationBarHidden(true)
+                    .onDisappear {
+                        leaveLobby()
+                        isGameStarted = false
+                    },
                     isActive: $isGameStarted
                 ) {
                     EmptyView()
                 }
+
 
                 .disabled(isLoading)            }
             .navigationBarHidden(true)
@@ -236,8 +244,14 @@ struct CreateGameView: View {
             if !lobbyCreated {
                 createLobby()
             } else {
-                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen for updates from the correct lobby
+                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId)
             }
+            // Start listening for players' locations when the view appears
+            playersLocationViewModel.listenForPlayers(userIds: lobbyViewModel.users)
+        }
+        // Update players' locations whenever the list of users in the lobby changes
+        .onChange(of: lobbyViewModel.users) { newUserIds in
+            playersLocationViewModel.listenForPlayers(userIds: newUserIds)
         }
         .onChange(of: lobbyViewModel.gameState) { newState in
             if newState == "active" && !isGameStarted {
