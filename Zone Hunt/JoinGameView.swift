@@ -20,7 +20,8 @@ struct JoinGameView: View {
     @State private var isGameStarted = false           // Added to trigger navigation
     @State private var userLocation: CLLocationCoordinate2D? = nil // Added binding for MapView
     @StateObject private var lobbyViewModel = LobbyViewModel()
-    
+    @StateObject private var playersLocationViewModel = PlayersLocationViewModel()
+
     private let db = Firestore.firestore()
     
     //var lobbyId: String // Use the passed-in lobbyId instead of a @State variable
@@ -113,22 +114,39 @@ struct JoinGameView: View {
             .navigationBarHidden(true)
             
             // Hidden NavigationLink to MapView
+
             NavigationLink(
-                destination: MapView(region: $region, radius: $radius, userLocation: $userLocation, onExit: leaveLobby)
-                    .edgesIgnoringSafeArea(.all)
-                    .navigationBarHidden(true)
-                    .onDisappear {
-                        lobbyViewModel.stopListening()
-                        leaveLobby()
-                    },
+                destination: MapView(
+                    region: $region,
+                    radius: $radius,
+                    userLocation: $userLocation,
+                    playersLocations: playersLocationViewModel.playersLocations,
+                    onExit: leaveLobby
+                )
+                .edgesIgnoringSafeArea(.all)
+                .navigationBarHidden(true)
+                .onDisappear {
+                    leaveLobby()
+                    isGameStarted = false
+                },
                 isActive: $isGameStarted
             ) {
                 EmptyView()
             }
+
         }
         .onAppear {
-            self.lobbyId = "\(gameCode)" // Ensure lobbyId is set correctly
-            self.lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId) // Listen to correct lobby
+            if !lobbyCreated {
+                createLobby()
+            } else {
+                lobbyViewModel.listenForLobbyUpdates(lobbyId: lobbyId)
+            }
+            // Start listening for players' locations when the view appears
+            playersLocationViewModel.listenForPlayers(userIds: lobbyViewModel.users)
+        }
+        // Update players' locations whenever the list of users in the lobby changes
+        .onChange(of: lobbyViewModel.users) { newUserIds in
+            playersLocationViewModel.listenForPlayers(userIds: newUserIds)
         }
         .onChange(of: lobbyViewModel.gameState) { newState in
             if newState == "active" && !isGameStarted {
@@ -136,8 +154,10 @@ struct JoinGameView: View {
             }
         }
         .onDisappear {
-            lobbyViewModel.stopListening()
-            leaveLobby()
+            if !isEditingSettings && !isGameStarted {
+                lobbyViewModel.stopListening()
+                leaveLobby()
+            }
         }
         .onChange(of: lobbyViewModel.messages) { newMessages in
             print("Messages Updated: \(newMessages)")

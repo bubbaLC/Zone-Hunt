@@ -1,43 +1,60 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import FirebaseAuth
 
 struct MapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     @Binding var radius: Double
-    @Binding var userLocation: CLLocationCoordinate2D? // Binding for user's coordinates
-    let locationManager = CLLocationManager()
-    var onExit: () -> Void // Callback for leaving the lobby
-    let mapView = MKMapView() // Keep reference to the mapView
-    let userAnnotation = MKPointAnnotation() // Store annotation reference
-
+    @Binding var userLocation: CLLocationCoordinate2D?
+    var playersLocations: [String: CLLocationCoordinate2D] // Provided from PlayersLocationViewModel
+    let onExit: () -> Void
+    let mapView = MKMapView()
+    let userAnnotation = MKPointAnnotation()
+    
     func makeUIView(context: Context) -> MKMapView {
         mapView.translatesAutoresizingMaskIntoConstraints = false
-        mapView.showsUserLocation = false  // Hide default blue dot since we add a custom one
+        // We disable the default blue dot since we’re using a custom annotation.
+        mapView.showsUserLocation = false
         mapView.isZoomEnabled = true
         mapView.isScrollEnabled = true
         mapView.delegate = context.coordinator
         
-        locationManager.delegate = context.coordinator
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
+        // Configure location manager via coordinator.
+        context.coordinator.locationManager.requestWhenInUseAuthorization()
+        context.coordinator.locationManager.startUpdatingLocation()
 
         return mapView
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        // Update the region to re-center the map.
         uiView.setRegion(region, animated: true)
         
-        // Remove previous user location annotation to prevent duplicates
+        // Remove all annotations so we can add updated ones.
         uiView.removeAnnotations(uiView.annotations)
         
-        // Update user's annotation dynamically
-        if let userLocation = userLocation {
-            userAnnotation.coordinate = userLocation
+        // Add custom user location annotation.
+        if let userLoc = userLocation {
+            userAnnotation.coordinate = userLoc
+            userAnnotation.title = "You"
             uiView.addAnnotation(userAnnotation)
+        } else {
+            print("userLocation is nil")
+        }
+        
+        // Add annotations for players.
+        for (playerId, coordinate) in playersLocations {
+            // Optionally exclude the current user.
+            if let currentUserId = Auth.auth().currentUser?.uid, currentUserId == playerId {
+                continue
+            }
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            annotation.title = "Player \(playerId)" // Alternatively use a username if available.
+            uiView.addAnnotation(annotation)
         }
     }
-
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -45,19 +62,26 @@ struct MapView: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate, CLLocationManagerDelegate {
         var parent: MapView
+        let locationManager = CLLocationManager()
         
         init(_ parent: MapView) {
             self.parent = parent
+            super.init()
+            locationManager.delegate = self
         }
+        
+        // MARK: - CLLocationManagerDelegate Methods
         
         func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
             if let location = locations.first {
                 DispatchQueue.main.async {
                     self.parent.userLocation = location.coordinate
+                    // Update the region to center on the new location.
                     self.parent.region = MKCoordinateRegion(
                         center: location.coordinate,
                         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
                     )
+                    print("Updated location: \(location.coordinate)")
                 }
             }
         }
@@ -68,69 +92,42 @@ struct MapView: UIViewRepresentable {
             }
         }
         
+        // MARK: - MKMapViewDelegate Method for Custom Annotation Views
+        
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            // Skip default user location annotation
-            if annotation is MKUserLocation {
-                return nil
-            }
-
+            // Skip the default user location annotation.
+            if annotation is MKUserLocation { return nil }
+            
             let identifier = "UserLocationMarker"
             var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-
+            
             if view == nil {
-                let size: CGFloat = 20
+                // Increase the size for better visibility.
+                let size: CGFloat = 25
                 view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                view?.frame.size = CGSize(width: size, height: size)
-                view?.canShowCallout = false
-
-                // Create a solid blue circle
+                view?.frame = CGRect(x: 0, y: 0, width: size, height: size)
+                view?.canShowCallout = true
+                
+                // Create a circular view.
                 let circleView = UIView(frame: CGRect(x: 0, y: 0, width: size, height: size))
-                circleView.backgroundColor = UIColor.blue
-                circleView.layer.cornerRadius = size / 2  // Make it a circle
+                // Use a distinctive color for "You" vs. other players.
+                if annotation.title ?? "" == "You" {
+                    circleView.backgroundColor = UIColor.systemBlue
+                } else {
+                    circleView.backgroundColor = UIColor.red
+                }
+                circleView.layer.cornerRadius = size / 2
+                circleView.layer.borderWidth = 2
                 circleView.layer.borderColor = UIColor.white.cgColor
-                circleView.layer.borderWidth = 2  // Optional: Adds a clean white outline
-
+                
+                // Ensure we remove any previous subviews.
+                view?.subviews.forEach { $0.removeFromSuperview() }
                 view?.addSubview(circleView)
             } else {
                 view?.annotation = annotation
             }
-
+            
             return view
         }
-
-        
-//        func addBlinkingAnimation(to view: MKAnnotationView) {
-//            let blinkAnimation = CABasicAnimation(keyPath: "opacity")
-//            blinkAnimation.fromValue = 1.0
-//            blinkAnimation.toValue = 0.3
-//            blinkAnimation.duration = 0.8
-//            blinkAnimation.autoreverses = true
-//            blinkAnimation.repeatCount = .infinity
-//            view.layer.add(blinkAnimation, forKey: "blink")
-//        }
-//        func addPulsingAnimation(to view: MKAnnotationView) {
-//            let pulseAnimation = CABasicAnimation(keyPath: "transform.scale")
-//            pulseAnimation.fromValue = 1.0
-//            pulseAnimation.toValue = 1.4
-//            pulseAnimation.duration = 1.2  // Slower pulse for smooth effect
-//            pulseAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-//            pulseAnimation.autoreverses = true
-//            pulseAnimation.repeatCount = .infinity
-//
-//            let fadeAnimation = CABasicAnimation(keyPath: "opacity")
-//            fadeAnimation.fromValue = 1.0
-//            fadeAnimation.toValue = 0.5
-//            fadeAnimation.duration = 1.2
-//            fadeAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-//            fadeAnimation.autoreverses = true
-//            fadeAnimation.repeatCount = .infinity
-//
-//            let animationGroup = CAAnimationGroup()
-//            animationGroup.animations = [pulseAnimation, fadeAnimation]
-//            animationGroup.duration = 1.2
-//            animationGroup.repeatCount = .infinity
-//
-//            view.layer.add(animationGroup, forKey: "pulse")
-//        }
     }
 }
