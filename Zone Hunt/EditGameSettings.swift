@@ -1,6 +1,7 @@
 //EditGameSettings.Swift
 import SwiftUI
 import MapKit
+import FirebaseFirestore
 // Rename MapView to GameMapView
 struct GameMapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
@@ -53,8 +54,8 @@ class PurpleTintRenderer: MKOverlayRenderer {
         super.init(overlay: circle)
     }
     override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        // Get the rect of the entire map (visible area) using the mapRect parameter
-        let fullMapRect = self.rect(for: mapRect)
+        // Get the rect for the entire world map projection
+        let fullMapRect = self.rect(for: MKMapRect.world)
         // Fill the entire map with a semi-transparent purple color
         context.setFillColor(UIColor.purple.withAlphaComponent(0.3).cgColor)
         context.fill(fullMapRect)
@@ -82,13 +83,14 @@ class PurpleTintRenderer: MKOverlayRenderer {
 //             }
 struct EditGameSettings: View {
     @Environment(\.dismiss) var dismiss
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), // Example: San Francisco
-        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-    )
-    
+    @State private var region: MKCoordinateRegion
     @State private var userTrackingMode: MKUserTrackingMode = .follow
-    @State private var zoneRadius: Double = 500 // initial radius in meters
+    @State private var zoneRadius: Double
+    
+    private let lobbyId: String
+    private let hostLocation: CLLocationCoordinate2D
+    private let initialRadius: Double
+
     var body: some View {
         VStack {
             Text("Edit Game Settings")
@@ -116,8 +118,8 @@ struct EditGameSettings: View {
                 .accentColor(.red)
                 .padding()
             Button(action: {
-                            // Dismiss the current view when this button is tapped
-                            dismiss()
+                            // Call saveSettings and then dismiss
+                            saveSettings()
                         }){
                 Text("Save Settings")
                     .font(.title2)
@@ -135,14 +137,43 @@ struct EditGameSettings: View {
         // .navigationBarHidden(true)
     }
     
-    private var gameView: CreateGameView
-    init(gameView: CreateGameView) {
-        self.gameView = gameView;
+    init(lobbyId: String, hostLocation: CLLocationCoordinate2D, initialRadius: Double) {
+        self.lobbyId = lobbyId
+        self.hostLocation = hostLocation
+        self.initialRadius = initialRadius
+        
+        // Initialize state variables using the passed values
+        _region = State(initialValue: MKCoordinateRegion(
+            center: hostLocation,
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05) // Keep span or adjust as needed
+        ))
+        _zoneRadius = State(initialValue: initialRadius)
     }
     
-}
-struct EditGameSettings_Previews: PreviewProvider {
-    static var previews: some View {
-        EditGameSettings(gameView: CreateGameView())
+    func saveSettings() {
+        let db = Firestore.firestore()
+        db.collection("lobbies").document(lobbyId).updateData([
+            "zoneRadius": zoneRadius
+        ]) { error in
+            if let error = error {
+                print("Error updating zone radius: \(error.localizedDescription)")
+                // Optionally show an error message to the user
+            } else {
+                print("Zone radius successfully updated in Firestore for lobby \(lobbyId)")
+                dismiss() // Dismiss the view on successful save
+            }
+        }
     }
 }
+
+// Update PreviewProvider if necessary, or comment it out if it causes issues
+//struct EditGameSettings_Previews: PreviewProvider {
+//    static var previews: some View {
+//        // Provide sample data for preview
+//        EditGameSettings(
+//            lobbyId: "previewLobby",
+//            hostLocation: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+//            initialRadius: 500.0
+//        )
+//    }
+//}

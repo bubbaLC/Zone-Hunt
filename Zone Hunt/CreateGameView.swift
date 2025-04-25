@@ -185,7 +185,9 @@ struct CreateGameView: View {
                 }
                 .padding(.horizontal)
                 
-                NavigationLink(destination: EditGameSettings(gameView: self)
+                NavigationLink(destination: EditGameSettings(lobbyId: lobbyId,
+                                                          hostLocation: region.center,
+                                                          initialRadius: radius)
                                  .onAppear { isEditingSettings = true }
                                  .onDisappear { isEditingSettings = false }) {
                     Text("Edit Game Settings")
@@ -313,8 +315,8 @@ struct CreateGameView: View {
                 } else {
                     print("Lobby created with code \(code)!")
                     DispatchQueue.main.async {
-                        self.lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
                         self.lobbyId = gameCodeString
+                        self.lobbyViewModel.listenForLobbyUpdates(lobbyId: gameCodeString)
                     }
                 }
             }
@@ -414,7 +416,7 @@ struct BlurredBackground: View {
 
 struct CreateGameView_Previews: PreviewProvider {
     static var previews: some View {
-        //CreateGameView(lobbyId: "123456")
+        //Removed lobbyId requirement for preview
         CreateGameView()
     }
 }
