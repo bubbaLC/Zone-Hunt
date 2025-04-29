@@ -21,6 +21,7 @@ class PlayersLocationViewModel: ObservableObject {
             return
         }
 
+        
         // Remove any existing listener before starting a new one.
         listener?.remove()
         

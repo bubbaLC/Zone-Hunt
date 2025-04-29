@@ -185,7 +185,7 @@ struct CreateGameView: View {
                 }
                 .padding(.horizontal)
                 
-                NavigationLink(destination: EditGameSettings(gameView: self)
+                NavigationLink(destination: EditGameSettings(zoneRadius: $radius)
                                  .onAppear { isEditingSettings = true }
                                  .onDisappear { isEditingSettings = false }) {
                     Text("Edit Game Settings")
