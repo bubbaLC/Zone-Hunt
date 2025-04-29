@@ -91,13 +91,13 @@ struct EditGameSettings: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var locationManager = LocationManager()
     
+    @Binding var zoneRadius: Double // <-- bind to parent
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0, longitude: 0), // default until updated
+        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
     @State private var userTrackingMode: MKUserTrackingMode = .follow
-    @State private var zoneRadius: Double = 500
     @State private var userLocation: CLLocationCoordinate2D? = nil
 
     var body: some View {
@@ -137,7 +137,7 @@ struct EditGameSettings: View {
                 .padding()
 
             Button(action: {
-                dismiss()
+                dismiss() // Changes auto-saved due to binding
             }) {
                 Text("Save Settings")
                     .font(.title2)
@@ -153,15 +153,11 @@ struct EditGameSettings: View {
             }
         }
     }
-
-    private var gameView: CreateGameView
-    init(gameView: CreateGameView) {
-        self.gameView = gameView;
-    }
 }
 
 struct EditGameSettings_Previews: PreviewProvider {
     static var previews: some View {
-        EditGameSettings(gameView: CreateGameView())
+        EditGameSettings(zoneRadius: .constant(500))
     }
 }
+
