@@ -1,18 +1,19 @@
-//EditGameSettings.Swift
+// EditGameSettings.swift
 import SwiftUI
 import MapKit
 import CoreLocation
+
 extension CLLocationCoordinate2D: @retroactive Equatable {
     public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
-        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+        lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
     }
 }
-// Rename MapView to GameMapView
+
 struct GameMapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
     @Binding var userTrackingMode: MKUserTrackingMode
     @Binding var radius: Double
-    
+
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.showsUserLocation = true
@@ -20,83 +21,69 @@ struct GameMapView: UIViewRepresentable {
         mapView.delegate = context.coordinator
         return mapView
     }
-    
+
     func updateUIView(_ uiView: MKMapView, context: Context) {
         uiView.setRegion(region, animated: true)
-        uiView.removeOverlays(uiView.overlays) // Remove existing overlays
-        
-        // Add circle overlay
+        uiView.removeOverlays(uiView.overlays)
+
+        // Add the editor preview circle overlay
         let circle = MKCircle(center: region.center, radius: radius)
         uiView.addOverlay(circle)
     }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: GameMapView
-        
-        init(_ parent: GameMapView) {
-            self.parent = parent
-        }
-        
+        init(_ parent: GameMapView) { self.parent = parent }
+
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if let circleOverlay = overlay as? MKCircle {
-                return PurpleTintRenderer(circle: circleOverlay, mapView: mapView)
+            guard let circle = overlay as? MKCircle else {
+                return MKOverlayRenderer(overlay: overlay)
             }
-            return MKOverlayRenderer()
+            // Use the editor-specific tint renderer
+            return EditorTintRenderer(circle: circle)
         }
     }
 }
-// Custom renderer to handle the purple tint outside the circle
-class PurpleTintRenderer: MKOverlayRenderer {
-    let circleOverlay: MKCircle
-    init(circle: MKCircle, mapView: MKMapView) {
+
+// Editor-only renderer (purple outside, clear inside, red border)
+class EditorTintRenderer: MKOverlayRenderer {
+    private let circleOverlay: MKCircle
+
+    init(circle: MKCircle) {
         self.circleOverlay = circle
         super.init(overlay: circle)
     }
-    
+
     override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        let worldRect = self.rect(for: MKMapRect.world) // Entire world, not just visible screen
-        
-        // Fill the whole world with purple
+        // 1) Fill whole world in semi-transparent purple
+        let worldRect = rect(for: MKMapRect.world)
         context.setFillColor(UIColor.purple.withAlphaComponent(0.3).cgColor)
         context.fill(worldRect)
-        
-        // Then cut out the circle (the clear game zone)
-        let circleRect = self.rect(for: circleOverlay.boundingMapRect)
+
+        // 2) Clear out the safe zone
+        let circleRect = rect(for: circleOverlay.boundingMapRect)
         context.setBlendMode(.clear)
         context.fillEllipse(in: circleRect)
-        
-        // Draw red border around the clear zone
+
+        // 3) Draw the red border
         context.setBlendMode(.normal)
         context.setStrokeColor(UIColor.red.cgColor)
-        context.setLineWidth(300.0) // Clean thin red outline
+        context.setLineWidth(3 / zoomScale)
         context.strokeEllipse(in: circleRect)
     }
 }
 
-/* old function */
-//func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-//            if let circleOverlay = overlay as? MKCircle {
-//                let renderer = MKCircleRenderer(circle: circleOverlay)
-//                renderer.strokeColor = .red
-//                renderer.lineWidth = 3
-//                return renderer
-//            }
-//            return MKOverlayRenderer()
-//             }
 struct EditGameSettings: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var locationManager = LocationManager()
-    
-    @Binding var zoneRadius: Double // <-- bind to parent
+    @Binding var zoneRadius: Double
+
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
-    
     @State private var userTrackingMode: MKUserTrackingMode = .follow
     @State private var userLocation: CLLocationCoordinate2D? = nil
 
@@ -107,26 +94,30 @@ struct EditGameSettings: View {
                 .padding(.top, 20)
 
             ZStack {
-                GameMapView(region: $region, userTrackingMode: $userTrackingMode, radius: $zoneRadius)
-                    .frame(height: 300)
-                    .cornerRadius(15)
-                    .padding()
-                    .onAppear {
-                        if let userLoc = locationManager.location {
-                            userLocation = userLoc
-                            region.center = userLoc
-                        }
+                GameMapView(
+                    region: $region,
+                    userTrackingMode: $userTrackingMode,
+                    radius: $zoneRadius
+                )
+                .frame(height: 300)
+                .cornerRadius(15)
+                .padding()
+                .onAppear {
+                    if let loc = locationManager.location {
+                        userLocation = loc
+                        region.center = loc
                     }
-                    .onChange(of: locationManager.location) { newLocation in
-                        if let newLoc = newLocation {
-                            userLocation = newLoc
-                            region.center = newLoc
-                        }
+                }
+                .onChange(of: locationManager.location) { newLoc in
+                    if let loc = newLoc {
+                        userLocation = loc
+                        region.center = loc
                     }
+                }
 
                 VStack {
                     Spacer()
-                    Text("Radius of Zone Border: \(Int(zoneRadius)) meters")
+                    Text("Radius: \(Int(zoneRadius)) m")
                         .foregroundColor(.white)
                         .padding(.bottom, 20)
                 }
@@ -136,21 +127,17 @@ struct EditGameSettings: View {
                 .accentColor(.red)
                 .padding()
 
-            Button(action: {
-                dismiss() // Changes auto-saved due to binding
-            }) {
-                Text("Save Settings")
-                    .font(.title2)
-                    .fontWeight(.heavy)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .cornerRadius(10)
-                    .padding(.horizontal, 25)
-                    .padding(.top,10)
-                    .padding(.bottom, 65)
+            Button("Save Settings") {
+                dismiss()
             }
+            .font(.title2).fontWeight(.bold)
+            .foregroundColor(.white)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.green)
+            .cornerRadius(10)
+            .padding(.horizontal, 25)
+            .padding(.vertical, 20)
         }
     }
 }
@@ -160,4 +147,3 @@ struct EditGameSettings_Previews: PreviewProvider {
         EditGameSettings(zoneRadius: .constant(500))
     }
 }
-

@@ -12,30 +12,28 @@ struct MapView: UIViewRepresentable {
     let onExit: () -> Void
     let mapView = MKMapView()
     let userAnnotation = MKPointAnnotation()
-    
+
     func makeUIView(context: Context) -> MKMapView {
         mapView.translatesAutoresizingMaskIntoConstraints = false
-        // We disable the default blue dot since we’re using a custom annotation.
         mapView.showsUserLocation = false
         mapView.isZoomEnabled = true
         mapView.isScrollEnabled = true
         mapView.delegate = context.coordinator
-        
-        // Configure location manager via coordinator.
+
         context.coordinator.locationManager.requestWhenInUseAuthorization()
         context.coordinator.locationManager.startUpdatingLocation()
 
         return mapView
     }
-    
+
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        // Update the region to re-center the map.
         uiView.setRegion(region, animated: true)
-        
-        // Remove all annotations so we can add updated ones.
+
+        // Remove previous annotations and overlays
         uiView.removeAnnotations(uiView.annotations)
-        
-        // Add custom user location annotation.
+        uiView.removeOverlays(uiView.overlays)
+
+        // Add user annotation
         if let userLoc = userLocation {
             userAnnotation.coordinate = userLoc
             userAnnotation.title = "You"
@@ -43,41 +41,41 @@ struct MapView: UIViewRepresentable {
         } else {
             print("userLocation is nil")
         }
-        
-        // Add annotations for players.
+
+        // Add other players' annotations
         for (playerId, coordinate) in playersLocations {
-            // Optionally exclude the current user.
             if let currentUserId = Auth.auth().currentUser?.uid, currentUserId == playerId {
                 continue
             }
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinate
-            annotation.title = "Player \(playerId)" // Alternatively use a username if available.
+            annotation.title = "Player \(playerId)"
             uiView.addAnnotation(annotation)
         }
+
+        // Add game zone overlay
+        let zoneCircle = MKCircle(center: region.center, radius: radius)
+        uiView.addOverlay(zoneCircle)
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     class Coordinator: NSObject, MKMapViewDelegate, CLLocationManagerDelegate {
         var parent: MapView
         let locationManager = CLLocationManager()
-        
+
         init(_ parent: MapView) {
             self.parent = parent
             super.init()
             locationManager.delegate = self
         }
-        
-        // MARK: - CLLocationManagerDelegate Methods
-        
+
         func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
             if let location = locations.first {
                 DispatchQueue.main.async {
                     self.parent.userLocation = location.coordinate
-                    // Update the region to center on the new location.
                     self.parent.region = MKCoordinateRegion(
                         center: location.coordinate,
                         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
@@ -86,32 +84,26 @@ struct MapView: UIViewRepresentable {
                 }
             }
         }
-        
+
         func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
             if status == .authorizedWhenInUse || status == .authorizedAlways {
                 manager.startUpdatingLocation()
             }
         }
-        
-        // MARK: - MKMapViewDelegate Method for Custom Annotation Views
-        
+
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            // Skip the default user location annotation.
             if annotation is MKUserLocation { return nil }
-            
+
             let identifier = "UserLocationMarker"
             var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-            
+
             if view == nil {
-                // Increase the size for better visibility.
                 let size: CGFloat = 25
                 view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
                 view?.frame = CGRect(x: 0, y: 0, width: size, height: size)
                 view?.canShowCallout = true
-                
-                // Create a circular view.
+
                 let circleView = UIView(frame: CGRect(x: 0, y: 0, width: size, height: size))
-                // Use a distinctive color for "You" vs. other players.
                 if annotation.title ?? "" == "You" {
                     circleView.backgroundColor = UIColor.systemBlue
                 } else {
@@ -120,15 +112,49 @@ struct MapView: UIViewRepresentable {
                 circleView.layer.cornerRadius = size / 2
                 circleView.layer.borderWidth = 2
                 circleView.layer.borderColor = UIColor.white.cgColor
-                
-                // Ensure we remove any previous subviews.
+
                 view?.subviews.forEach { $0.removeFromSuperview() }
                 view?.addSubview(circleView)
             } else {
                 view?.annotation = annotation
             }
-            
+
             return view
         }
+
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            guard let circle = overlay as? MKCircle else {
+                return MKOverlayRenderer(overlay: overlay)
+            }
+            return PurpleTintRenderer(circle: circle, mapView: mapView)
+        }
+    }
+}
+
+// Custom circle renderer with purple tint and clear cut-out
+class PurpleTintRenderer: MKOverlayRenderer {
+    private let circleOverlay: MKCircle
+
+    init(circle: MKCircle, mapView: MKMapView) {
+        self.circleOverlay = circle
+        super.init(overlay: circle)
+    }
+
+    override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
+        // 1) Fill the visible area (mapRect) in semi-transparent purple
+        let fillRect = rect(for: mapRect)
+        context.setFillColor(UIColor.purple.withAlphaComponent(0.3).cgColor)
+        context.fill(fillRect)
+
+        // 2) “Cut out” the safe zone
+        let circleRect = rect(for: circleOverlay.boundingMapRect)
+        context.setBlendMode(.clear)
+        context.fillEllipse(in: circleRect)
+
+        // 3) Draw red border around the clear zone
+        context.setBlendMode(.normal)
+        context.setStrokeColor(UIColor.red.cgColor)
+        context.setLineWidth(3 / zoomScale) // keep width consistent across zooms
+        context.strokeEllipse(in: circleRect)
     }
 }
